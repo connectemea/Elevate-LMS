@@ -1,0 +1,9 @@
+export { default as Title } from "antd/es/typography/Title";
+export { default as Text } from "antd/es/typography/Text";
+export { default as Table } from "antd/es/table";
+export { default as Button } from "antd/es/button";
+export { default as Space } from "antd/es/space";
+export { default as Card } from "antd/es/card";
+export { default as Form } from "antd/es/form";
+export { default as Input } from "antd/es/input";
+export { default as message } from "antd/es/message";
