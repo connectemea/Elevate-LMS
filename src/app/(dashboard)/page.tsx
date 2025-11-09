@@ -1,4 +1,5 @@
 import { Card, Typography, Row, Col } from "antd";
+import { StatsCards } from '@/components/analytics/StatsCards';
 
 export default function DashboardPage() {
   const cards = [
@@ -22,6 +23,11 @@ export default function DashboardPage() {
           </Col>
         ))}
       </Row>
+
+       <div className="container mx-auto p-6">
+      <h1 className="text-3xl font-bold mb-6">Analytics Dashboard</h1>
+      <StatsCards />
+    </div>
     </div>
   );
 }
