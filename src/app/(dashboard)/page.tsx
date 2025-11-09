@@ -1,5 +1,6 @@
-import { Card, Typography, Row, Col } from "antd";
-import { StatsCards } from '@/components/analytics/StatsCards';
+import { Card,  Row, Col } from "antd";
+import { Title,Text} from "@/components/antd"
+// import { StatsCards } from '@/components/analytics/StatsCards';
 
 export default function DashboardPage() {
   const cards = [
@@ -10,24 +11,24 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <Typography.Title level={3} style={{ marginBottom: 24 }}>
+      <Title level={3} style={{ marginBottom: 24 }}>
         Dashboard Overview
-      </Typography.Title>
+      </Title>
       <Row gutter={[16, 16]}>
         {cards.map((c) => (
           <Col xs={24} sm={12} md={8} key={c.title}>
             <Card>
-              <Typography.Title level={4}>{c.title}</Typography.Title>
-              <Typography.Text strong>{c.value}</Typography.Text>
+              <Title level={4}>{c.title}</Title>
+              <Text strong>{c.value}</Text>
             </Card>
           </Col>
         ))}
       </Row>
 
-       <div className="container mx-auto p-6">
+       {/* <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-6">Analytics Dashboard</h1>
       <StatsCards />
-    </div>
+    </div> */}
     </div>
   );
 }
