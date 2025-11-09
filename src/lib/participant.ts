@@ -1,4 +1,4 @@
-import { prisma } from './primsa'
+import { prisma } from './prisma'
 
 export async function getParticipantStats() {
   return await prisma.participant.aggregate({

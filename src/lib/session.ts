@@ -1,4 +1,4 @@
-import { prisma } from './primsa'
+import { prisma } from './prisma'
 
 export async function getSessionProgressStats() {
   return await prisma.sessionProgress.groupBy({
