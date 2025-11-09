@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "next lint",
+    "clean": "rm -rf .next",
+    "build:force": "pnpm clean && pnpm build"
   },
   "dependencies": {
     "@ant-design/icons": "^6.1.0",
@@ -20,13 +22,13 @@
   "devDependencies": {
     "@prisma/client": "^6.19.0",
     "@tanstack/react-query-devtools": "^5.90.2",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/node": "^24.10.0",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "prisma": "^6.19.0",
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }
