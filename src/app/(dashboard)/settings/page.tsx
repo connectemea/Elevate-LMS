@@ -1,41 +1,66 @@
 "use client";
 
-import { Title, Card, Form, Input, Button, message } from "@/components/antd";
+import { Title, Card, Button, message  ,Alert } from "@/components/antd";
+import { SaveOutlined, SettingOutlined } from "@ant-design/icons";
 
 export default function SettingsPage() {
-  const [form] = Form.useForm();
-
+  const [messageApi, contextHolder] = message.useMessage();
   const handleSave = () => {
-    message.success("Settings saved successfully!");
+    // message.success("Settings saved successfully!");
+    messageApi.info("Eyy stupid crocodile! There is nothing to save yet.");
   };
 
   return (
-    <div style={{ padding: 24 }}>
-      <Title level={3}>Settings</Title>
-      <Card style={{ maxWidth: 500, marginTop: 24 }}>
-        <Form layout="vertical" form={form} onFinish={handleSave}>
-          <Form.Item
-            label="Site Name"
-            name="siteName"
-            rules={[{ required: true, message: "Please enter a site name" }]}
-          >
-            <Input placeholder="Enter site name" />
-          </Form.Item>
+    <div style={{ padding: 24, maxWidth: 600, margin: '0 auto' }}>
+      <Title level={2}>
+        <SettingOutlined style={{ marginRight: 12 }} />
+        System Settings
+      </Title>
+   {contextHolder}
+      <Card>
+        {/* Simple Message */}
+        <Alert
+          message="More Settings Coming Soon"
+          description="We're working on adding more customization options for your learning platform. Advanced features will be available in the next update."
+          type="info"
+          showIcon
+          style={{ marginBottom: 24 }}
+        />
 
-          <Form.Item
-            label="Admin Email"
-            name="adminEmail"
-            rules={[{ type: "email", message: "Enter a valid email" }]}
-          >
-            <Input placeholder="admin@example.com" />
-          </Form.Item>
+        {/* Basic Info Section */}
+        <div style={{ marginBottom: 24 }}>
+          <Title level={4}>How Your Platform Works</Title>
+          <div style={{ lineHeight: '1.8', color: '#666' }}>
+            <p>🎯 <strong>Students</strong> enroll in courses and track their progress</p>
+            <p>📚 <strong>Courses</strong> are organized into categories and sessions</p>
+            <p>📊 <strong>Progress</strong> is manually tracked as students complete sessions</p>
+            <p>👨‍🏫 <strong>Admin</strong> manage everything from this admin dashboard</p>
+          </div>
+        </div>
 
-          <Form.Item>
-            <Button type="primary" htmlType="submit">
-              Save Changes
-            </Button>
-          </Form.Item>
-        </Form>
+        {/* Coming Soon Notice */}
+        <div style={{ 
+          background: '#f9f9f9', 
+          padding: 16, 
+          borderRadius: 6,
+          border: '1px dashed #d9d9d9',
+          textAlign: 'center'
+        }}>
+          <p style={{ margin: 0, color: '#999' }}>
+            <strong>More settings features coming soon!</strong>
+          </p>
+        </div>
+
+        <div style={{ marginTop: 24, textAlign: 'center' }}>
+          <Button 
+            type="primary" 
+            icon={<SaveOutlined />}
+            onClick={handleSave}
+            size="large"
+          >
+            Save Current Settings
+          </Button>
+        </div>
       </Card>
     </div>
   );
