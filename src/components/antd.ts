@@ -7,3 +7,4 @@ export { default as Card } from "antd/es/card";
 export { default as Form } from "antd/es/form";
 export { default as Input } from "antd/es/input";
 export { default as message } from "antd/es/message";
+export { default as Typography } from "antd/es/typography";
