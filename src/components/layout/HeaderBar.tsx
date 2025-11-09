@@ -1,15 +1,37 @@
 "use client";
 
-import { Layout, Avatar, Dropdown, Typography } from "antd";
-import { UserOutlined } from "@ant-design/icons";
+import { Layout, Avatar, Dropdown, Typography, Button } from "antd";
+import {
+  UserOutlined,
+  LogoutOutlined,
+  DownOutlined,
+} from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 
 const { Header } = Layout;
 
 export default function HeaderBar() {
+  const router = useRouter();
+
+  const handleLogout = () => {
+    // Example: Clear tokens, session, or local storage if needed
+    localStorage.removeItem("token");
+    sessionStorage.clear();
+
+    // Redirect to home or login page
+    router.push("/");
+  };
+
   const menuItems = [
     { key: "profile", label: "Profile" },
-    { key: "logout", label: "Logout" },
+    { type: "divider" as const },
+    { key: "logout", label: "Logout", icon: <LogoutOutlined /> },
   ];
+
+  const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === "logout") handleLogout();
+    if (key === "profile") console.log("Profile clicked");
+  };
 
   return (
     <Header
@@ -26,16 +48,37 @@ export default function HeaderBar() {
         Admin Panel
       </Typography.Title>
 
-      <Dropdown
-        menu={{ items: menuItems }}
-        placement="bottomRight"
-        arrow
-      >
-        <Avatar
-          icon={<UserOutlined />}
-          style={{ cursor: "pointer", backgroundColor: "#1677ff" }}
-        />
-      </Dropdown>
+      <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
+        <Button
+          type="primary"
+          icon={<LogoutOutlined />}
+          onClick={handleLogout}
+          danger
+        >
+          Logout
+        </Button>
+
+        <Dropdown
+          menu={{ items: menuItems, onClick: handleMenuClick }}
+          placement="bottomRight"
+          arrow
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              cursor: "pointer",
+              gap: "8px",
+            }}
+          >
+            <Avatar
+              icon={<UserOutlined />}
+              style={{ backgroundColor: "#1677ff" }}
+            />
+            <DownOutlined style={{ fontSize: "12px", color: "#555" }} />
+          </div>
+        </Dropdown>
+      </div>
     </Header>
   );
 }

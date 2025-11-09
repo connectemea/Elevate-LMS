@@ -25,7 +25,7 @@ export default function Sidebar() {
     { key: "/courses", icon: <BookOutlined />, label: <Link href="/courses">Courses</Link> },
     { key: "/users", icon: <UserOutlined />, label: <Link href="/users">Users</Link> },
     { key: "/settings", icon: <SettingOutlined />, label: <Link href="/settings">Settings</Link> },
-    { key: "/logout", icon: <LogoutOutlined />, label: <Link href="/">Logout</Link> },
+    // { key: "/logout", icon: <LogoutOutlined />, label: <Link href="/">Logout</Link> },
     // { key: "logout", icon: <LogoutOutlined />, label: "Logout" },
   ];
 
