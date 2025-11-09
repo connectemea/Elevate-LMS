@@ -1,4 +1,4 @@
-import { prisma } from './primsa'
+import { prisma } from './prisma'
 
 export async function getCourseEnrollmentStats() {
   return await prisma.courseEnrollment.groupBy({
