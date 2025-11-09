@@ -1,6 +1,8 @@
 "use client";
 
 import { Layout, Menu } from "antd";
+import Logo from "@/assets/elevate.png";
+import Image from "next/image";
 import {
   DashboardOutlined,
   BookOutlined,
@@ -23,7 +25,8 @@ export default function Sidebar() {
     { key: "/courses", icon: <BookOutlined />, label: <Link href="/courses">Courses</Link> },
     { key: "/users", icon: <UserOutlined />, label: <Link href="/users">Users</Link> },
     { key: "/settings", icon: <SettingOutlined />, label: <Link href="/settings">Settings</Link> },
-    { key: "logout", icon: <LogoutOutlined />, label: "Logout" },
+    { key: "/logout", icon: <LogoutOutlined />, label: <Link href="/">Logout</Link> },
+    // { key: "logout", icon: <LogoutOutlined />, label: "Logout" },
   ];
 
   return (
@@ -32,7 +35,7 @@ export default function Sidebar() {
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
       width={220}
-      style={{ background: "#001529" }}
+      style={{ background: "#24163a" }}
     >
       <div
         style={{
@@ -44,15 +47,24 @@ export default function Sidebar() {
           fontSize: 18,
         }}
       >
-        {collapsed ? "EL" : "Elevate LMS"}
+        
+             {collapsed ?  <Image
+              src={Logo}
+              alt="Elevate Logo"
+              width={32}
+              height={32}
+              style={{ objectFit: "contain", borderRadius: 8 }}
+            /> : "Elevate LMS"}
       </div>
       <Menu
         theme="dark"
         mode="inline"
         selectedKeys={[pathname]}
         items={items}
-        style={{ borderRight: 0 }}
+        style={{ background: "#24163a", borderRight: 0 }}
       />
+
+
     </Sider>
   );
 }
