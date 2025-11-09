@@ -6,7 +6,12 @@ export async function GET() {
     const courses = await prisma.course.findMany({
       include: {
         categories: {
-          orderBy: { orderIndex: 'asc' }
+          orderBy: { orderIndex: 'asc' },
+          include: {
+            sessions: {
+              orderBy: { orderIndex: 'asc' } // Add this to include sessions
+            }
+          }
         },
         _count: {
           select: { enrollments: true }
@@ -17,12 +22,14 @@ export async function GET() {
 
     return NextResponse.json({ courses })
   } catch (error) {
+    console.error('Error fetching courses:', error)
     return NextResponse.json(
       { error: 'Failed to fetch courses' },
       { status: 500 }
     )
   }
 }
+
 
 export async function POST(request: Request) {
   try {
