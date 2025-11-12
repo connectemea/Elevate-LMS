@@ -1,11 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Button, Space, Card, Tag, message, Modal,Form,Input } from "antd";
-  
-  
+import {
+  Table,
+  Button,
+  Space,
+  Card,
+  Tag,
+  message,
+  Modal,
+  Form,
+  Input,
+} from "antd";
+
 import { Title } from "@/components/antd";
-import { EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusOutlined,
+  EyeOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 interface Course {
@@ -22,8 +36,8 @@ interface Course {
 
 export default function CoursesPage() {
   const [courses, setCourses] = useState<Course[]>([]);
-    const [newCourseForm] = Form.useForm();
-    const [isAddCourseModalVisible, setIsAddCourseModalVisible] = useState(false);
+  const [newCourseForm] = Form.useForm();
+  const [isAddCourseModalVisible, setIsAddCourseModalVisible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [messageApi, contextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
@@ -35,6 +49,7 @@ export default function CoursesPage() {
       const response = await fetch("/api/courses");
       const data = await response.json();
       setCourses(data.courses || []);
+      console.log("Fetched courses:", data.courses);
     } catch (error) {
       messageApi.error("Failed to fetch courses");
       console.error("Error fetching courses:", error);
@@ -51,7 +66,7 @@ export default function CoursesPage() {
     router.push(`/courses/${courseId}`);
   };
 
-    const handleAddCourse = async (values: {
+  const handleAddCourse = async (values: {
     name: string;
     description: string;
   }) => {
@@ -130,13 +145,14 @@ export default function CoursesPage() {
     },
     {
       title: "Categories",
-      dataIndex: ["_count", "categories"],
+      dataIndex: "categories",
       key: "categories",
       align: "center" as const,
-      render: (categories: number) => (
-        <Tag>{categories || 0} categories</Tag>
+      render: (categories: any[] = []) => (
+        <Tag>{categories.length} categories</Tag>
       ),
     },
+
     {
       title: "Status",
       key: "status",
@@ -148,11 +164,11 @@ export default function CoursesPage() {
       key: "actions",
       width: 200,
       render: (_: any, record: Course) => (
-     <Space
-      direction="vertical" // stack buttons top to bottom
-      size="small"          // spacing between them
-      style={{ width: '100%', justifyContent: 'center' }}
-    >
+        <Space
+          direction="vertical"
+          size="small"
+          style={{ width: "100%", justifyContent: "center" }}
+        >
           <Button
             type="primary"
             icon={<EyeOutlined />}
@@ -188,7 +204,7 @@ export default function CoursesPage() {
           <Button
             type="primary"
             icon={<PlusOutlined />}
-             onClick={() => setIsAddCourseModalVisible(true)}
+            onClick={() => setIsAddCourseModalVisible(true)}
           >
             Add New Course
           </Button>
@@ -204,45 +220,45 @@ export default function CoursesPage() {
         />
       </Card>
 
-        {/* Add Course Modal */}
-            <Modal
-              title="Add New Course"
-              open={isAddCourseModalVisible}
-              onCancel={() => {
-                setIsAddCourseModalVisible(false);
-                newCourseForm.resetFields();
-              }}
-              footer={null}
-            >
-              <Form form={newCourseForm} layout="vertical" onFinish={handleAddCourse}>
-                <Form.Item
-                  name="name"
-                  label="Course Name"
-                  rules={[{ required: true, message: "Please enter course name" }]}
-                >
-                  <Input placeholder="Enter course name" />
-                </Form.Item>
-                <Form.Item
-                  name="description"
-                  label="Description"
-                  rules={[
-                    { required: true, message: "Please enter course description" },
-                  ]}
-                >
-                  <Input.TextArea placeholder="Enter course description" rows={3} />
-                </Form.Item>
-                <Form.Item>
-                  <Space>
-                    <Button type="primary" htmlType="submit">
-                      Add Course
-                    </Button>
-                    <Button onClick={() => setIsAddCourseModalVisible(false)}>
-                      Cancel
-                    </Button>
-                  </Space>
-                </Form.Item>
-              </Form>
-            </Modal>
+      {/* Add Course Modal */}
+      <Modal
+        title="Add New Course"
+        open={isAddCourseModalVisible}
+        onCancel={() => {
+          setIsAddCourseModalVisible(false);
+          newCourseForm.resetFields();
+        }}
+        footer={null}
+      >
+        <Form form={newCourseForm} layout="vertical" onFinish={handleAddCourse}>
+          <Form.Item
+            name="name"
+            label="Course Name"
+            rules={[{ required: true, message: "Please enter course name" }]}
+          >
+            <Input placeholder="Enter course name" />
+          </Form.Item>
+          <Form.Item
+            name="description"
+            label="Description"
+            rules={[
+              { required: true, message: "Please enter course description" },
+            ]}
+          >
+            <Input.TextArea placeholder="Enter course description" rows={3} />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Add Course
+              </Button>
+              <Button onClick={() => setIsAddCourseModalVisible(false)}>
+                Cancel
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {contextHolder}
       {modalContextHolder}

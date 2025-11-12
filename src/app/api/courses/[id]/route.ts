@@ -33,8 +33,23 @@ export async function GET(
       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
     }
 
+    // Calculate overall progress if participantId is provided
+    let overallProgress = 0;
+    if (participantId) {
+      const allSessions = course.categories.flatMap((category:any) => category.sessions);
+      const totalSessions = allSessions.length;
+      
+      if (totalSessions > 0) {
+        const completedSessions = allSessions.filter((session:any) => 
+          session.progress?.[0]?.status === 'completed'
+        ).length;
+        overallProgress = Math.round((completedSessions / totalSessions) * 100);
+      }
+    }
+
     const transformedCourse = {
       ...course,
+      overallProgress,
       categories: course.categories.map((category: any) => ({
         ...category,
         sessions: category.sessions.map((session: any) => ({
