@@ -30,9 +30,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
       <ConfigProvider theme={theme}>
+        <AntdRegistry>
          <Providers>
-        <AntdRegistry>{children}</AntdRegistry>
+        {children}
          </Providers>
+        </AntdRegistry>
          </ConfigProvider>
       </body>
     </html>

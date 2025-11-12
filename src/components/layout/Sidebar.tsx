@@ -23,11 +23,20 @@ export default function Sidebar() {
   const items = [
     // { key: "/", icon: <DashboardOutlined />, label: <Link href="/">Dashboard</Link> },
     { key: "/courses", icon: <BookOutlined />, label: <Link href="/courses">Courses</Link> },
-    { key: "/users", icon: <UserOutlined />, label: <Link href="/users">Users</Link> },
+    { key: "/participants", icon: <UserOutlined />, label: <Link href="/participants">Participants</Link> },
     { key: "/settings", icon: <SettingOutlined />, label: <Link href="/settings">Settings</Link> },
     // { key: "/logout", icon: <LogoutOutlined />, label: <Link href="/">Logout</Link> },
     // { key: "logout", icon: <LogoutOutlined />, label: "Logout" },
   ];
+
+   const selectedKey =
+    pathname.startsWith("/courses")
+      ? "/courses"
+      : pathname.startsWith("/participants")
+      ? "/participants"
+      : pathname.startsWith("/settings")
+      ? "/settings"
+      : "";
 
   return (
     <Sider
@@ -59,7 +68,7 @@ export default function Sidebar() {
       <Menu
         theme="dark"
         mode="inline"
-        selectedKeys={[pathname]}
+        selectedKeys={[selectedKey]}
         items={items}
         style={{ background: "#24163a", borderRight: 0 }}
       />
