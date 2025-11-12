@@ -23,7 +23,7 @@ export default function Sidebar() {
   const items = [
     // { key: "/", icon: <DashboardOutlined />, label: <Link href="/">Dashboard</Link> },
     { key: "/courses", icon: <BookOutlined />, label: <Link href="/courses">Courses</Link> },
-    { key: "/users", icon: <UserOutlined />, label: <Link href="/users">Users</Link> },
+    { key: "/participants", icon: <UserOutlined />, label: <Link href="/participants">Participants</Link> },
     { key: "/settings", icon: <SettingOutlined />, label: <Link href="/settings">Settings</Link> },
     // { key: "/logout", icon: <LogoutOutlined />, label: <Link href="/">Logout</Link> },
     // { key: "logout", icon: <LogoutOutlined />, label: "Logout" },
