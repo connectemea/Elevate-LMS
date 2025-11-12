@@ -29,6 +29,15 @@ export default function Sidebar() {
     // { key: "logout", icon: <LogoutOutlined />, label: "Logout" },
   ];
 
+   const selectedKey =
+    pathname.startsWith("/courses")
+      ? "/courses"
+      : pathname.startsWith("/participants")
+      ? "/participants"
+      : pathname.startsWith("/settings")
+      ? "/settings"
+      : "";
+
   return (
     <Sider
       collapsible
@@ -59,7 +68,7 @@ export default function Sidebar() {
       <Menu
         theme="dark"
         mode="inline"
-        selectedKeys={[pathname]}
+        selectedKeys={[selectedKey]}
         items={items}
         style={{ background: "#24163a", borderRight: 0 }}
       />
