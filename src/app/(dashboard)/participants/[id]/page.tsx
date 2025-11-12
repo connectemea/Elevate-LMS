@@ -125,6 +125,7 @@ export default function ParticipantDetailPage() {
       const response = await fetch(`/api/participants/${participantId}`);
       const data = await response.json();
       setParticipant(data.participant);
+      console.log("Fetched participant:", data.participant);
     } catch (error) {
       messageApi.error('Failed to fetch participant details');
       console.error('Error fetching participant:', error);
@@ -200,7 +201,17 @@ export default function ParticipantDetailPage() {
         messageApi.success("Participant enrolled successfully!");
         setIsEnrollModalVisible(false);
         enrollForm.resetFields();
-        fetchParticipantDetails();
+        // fetchParticipantDetails();/
+        // handle endroll without refetching participant details
+        const newEnrollment = await response.json();
+        setParticipant((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            enrollments: [...prev.enrollments, newEnrollment.enrollment],
+          };
+        });
+
       } else {
         messageApi.error("Failed to enroll participant");
       }
@@ -211,7 +222,7 @@ export default function ParticipantDetailPage() {
   };
 
   const handleUnenroll = async (enrollmentId: string) => {
-    Modal.confirm({
+    modal.confirm({
       title: "Are you sure you want to unenroll this participant?",
       content: "All their progress in this course will be lost.",
       okText: "Yes, Unenroll",
@@ -225,7 +236,17 @@ export default function ParticipantDetailPage() {
 
           if (response.ok) {
             messageApi.success("Participant unenrolled successfully!");
-            fetchParticipantDetails();
+            // fetchParticipantDetails();
+            // handle unenroll without refetching participant details
+            setParticipant((prev) => {
+              if (!prev) return prev;
+              return {
+                ...prev,
+                enrollments: prev.enrollments.filter(e => e.id !== enrollmentId),
+              };
+            }
+            );
+
           } else {
             messageApi.error("Failed to unenroll participant");
           }
@@ -258,7 +279,26 @@ export default function ParticipantDetailPage() {
         if (selectedEnrollment) {
           fetchCourseDetails(selectedEnrollment.courseId);
         }
-        fetchParticipantDetails();
+        // fetchParticipantDetails();
+        // Update session progress locally without refetching participant details
+        const updatedProgress = await response.json();
+        setParticipant((prev) => {
+          if (!prev) return prev;
+          const existingProgressIndex = prev.sessionProgress.findIndex(sp => sp.sessionId === sessionId);
+          let updatedSessionProgress = [...prev.sessionProgress];
+          if (existingProgressIndex >= 0) {
+            updatedSessionProgress[existingProgressIndex] = updatedProgress.sessionProgress;
+          }
+          else {
+            updatedSessionProgress.push(updatedProgress.sessionProgress);
+          }
+          return {
+            ...prev,
+            sessionProgress: updatedSessionProgress,
+          };
+        }
+        );
+
       } else {
         messageApi.error("Failed to update session progress");
       }
@@ -334,11 +374,11 @@ export default function ParticipantDetailPage() {
   // Enrollment Columns for Overview Tab
   const enrollmentColumns = [
     {
-      title: "Course",
-      dataIndex: "courseName",
-      key: "courseName",
-      render: (courseName: string) => <strong>{courseName}</strong>,
-    },
+    title: "Course",
+    dataIndex: ["course", "name"], // use array path for nested data
+    key: "courseName",
+    render: (name: string) => <strong>{name}</strong>,
+  },
     {
       title: "Progress",
       dataIndex: "progress",
@@ -370,30 +410,31 @@ export default function ParticipantDetailPage() {
       key: "enrolledAt",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
-    {
-      title: "Actions",
-      key: "actions",
-      render: (_: any, record: Enrollment) => (
-        <Space>
-          <Button 
-            type="primary" 
-            size="small"
-            icon={<EyeOutlined />}
-            onClick={() => handleViewProgress(record)}
-          >
-            Manage Progress
-          </Button>
-          <Button 
-            type="link" 
-            danger 
-            size="small"
-            onClick={() => handleUnenroll(record.id)}
-          >
-            Unenroll
-          </Button>
-        </Space>
-      ),
-    },
+   // In the enrollmentColumns array, update the actions column:
+{
+  title: "Actions",
+  key: "actions",
+  render: (_: any, record: Enrollment) => (
+    <Space>
+      <Button 
+        type="primary" 
+        size="small"
+        icon={<EyeOutlined />}
+        onClick={() => router.push(`/participants/${participantId}/course/${record.courseId}`)}
+      >
+        View Course Details
+      </Button>
+      <Button 
+        type="link" 
+        danger 
+        size="small"
+        onClick={() => handleUnenroll(record.id)}
+      >
+        Unenroll
+      </Button>
+    </Space>
+  ),
+},
   ];
 
   // Progress Columns for Progress Tab
@@ -467,7 +508,7 @@ export default function ParticipantDetailPage() {
 
         {/* Statistics */}
         <Row gutter={16}>
-          <Col span={6}>
+          <Col span={8}>
             <Card>
               <Statistic 
                 title="Total Enrollments" 
@@ -476,7 +517,7 @@ export default function ParticipantDetailPage() {
               />
             </Card>
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Card>
               <Statistic 
                 title="Completed Courses" 
@@ -485,7 +526,7 @@ export default function ParticipantDetailPage() {
               />
             </Card>
           </Col>
-          <Col span={6}>
+          <Col span={8}>
             <Card>
               <Statistic 
                 title="Average Progress" 
@@ -494,7 +535,7 @@ export default function ParticipantDetailPage() {
               />
             </Card>
           </Col>
-          <Col span={6}>
+          {/* <Col span={6}>
             <Card>
               <Statistic 
                 title="Member Since" 
@@ -502,7 +543,7 @@ export default function ParticipantDetailPage() {
                 prefix={<UserOutlined />}
               />
             </Card>
-          </Col>
+          </Col> */}
         </Row>
 
         {/* Tabs */}
@@ -680,7 +721,7 @@ export default function ParticipantDetailPage() {
       </Modal>
 
       {/* Progress Management Modal */}
-      <Modal
+      {/* <Modal
         title={
           <div>
             <div>Manage Progress: {participant.name}</div>
@@ -785,7 +826,7 @@ export default function ParticipantDetailPage() {
             </div>
           </div>
         )}
-      </Modal>
+      </Modal> */}
 
       {contextHolder}
       {modalContextHolder}

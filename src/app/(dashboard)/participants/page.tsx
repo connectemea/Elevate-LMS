@@ -6,6 +6,7 @@ import {
   Button, 
   Space, 
   Input, 
+  Form,
   Card, 
   Tag,
   Badge,
@@ -46,7 +47,9 @@ export default function ParticipantsPage() {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
-  const [modal, modalContextHolder] = Modal.useModal();
+   const [isAddParticipantModalVisible, setIsAddParticipantModalVisible] = useState(false);
+    const [newParticipantForm] = Form.useForm();
+   const [modal, modalContextHolder] = Modal.useModal();
   const router = useRouter();
 
   const fetchParticipants = async () => {
@@ -67,9 +70,36 @@ export default function ParticipantsPage() {
     fetchParticipants();
   }, []);
 
+
+
   const handleViewDetails = (participantId: string) => {
     router.push(`/participants/${participantId}`);
   };
+
+   const handleAddParticipant = async (values: { name: string; email: string; year: number }) => {
+     try {
+       const response = await fetch('/api/participants', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify(values),
+       });
+ 
+       if (response.ok) {
+         messageApi.success("Participant added successfully!");
+         setIsAddParticipantModalVisible(false);
+         newParticipantForm.resetFields();
+         fetchParticipants();
+       } else {
+         messageApi.error("Failed to add participant");
+       }
+     } catch (error) {
+       messageApi.error("Failed to add participant");
+       console.error('Error adding participant:', error);
+     }
+   };
+
 
   const handleDeleteParticipant = async (participantId: string) => {
     modal.confirm({
@@ -205,7 +235,7 @@ export default function ParticipantsPage() {
           <Button 
             type="primary" 
             icon={<PlusOutlined />}
-            onClick={() => router.push("/participants/new")}
+              onClick={() => setIsAddParticipantModalVisible(true)}
           >
             Add Participant
           </Button>
@@ -223,6 +253,63 @@ export default function ParticipantsPage() {
           locale={{ emptyText: "No participants found" }}
         />
       </Card>
+
+       {/* Add Participant Modal */}
+      <Modal
+        title="Add New Participant"
+        open={isAddParticipantModalVisible}
+        onCancel={() => {
+          setIsAddParticipantModalVisible(false);
+          newParticipantForm.resetFields();
+        }}
+        footer={null}
+      >
+        <Form
+          form={newParticipantForm}
+          layout="vertical"
+          onFinish={handleAddParticipant}
+        >
+          <Form.Item
+            name="name"
+            label="Full Name"
+            rules={[{ required: true, message: "Please enter participant name" }]}
+          >
+            <Input placeholder="Enter full name" prefix={<UserOutlined />} />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email"
+            rules={[
+              { required: true, message: "Please enter email address" },
+              { type: 'email', message: 'Please enter a valid email' }
+            ]}
+          >
+            <Input placeholder="Enter email address" type="email" />
+          </Form.Item>
+          <Form.Item
+            name="year"
+            label="Year"
+            rules={[{ required: true, message: "Please enter year" }]}
+          >
+            <Input 
+              placeholder="Enter year" 
+              type="number" 
+              min={2000}
+              max={2030}
+            />
+          </Form.Item>
+          <Form.Item>
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Add Participant
+              </Button>
+              <Button onClick={() => setIsAddParticipantModalVisible(false)}>
+                Cancel
+              </Button>
+            </Space>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       {contextHolder}
       {modalContextHolder}
