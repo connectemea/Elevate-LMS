@@ -1,50 +1,29 @@
-"use client";
-
-import { useEffect, useState } from "react";
+import { supabaseServer } from "@/lib/supabase-server";
+import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
 import { Layout } from "antd";
 import Sidebar from "@/components/layout/Sidebar";
 import HeaderBar from "@/components/layout/HeaderBar";
+import { redirect } from "next/navigation";
 
 const { Content } = Layout;
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const [isDesktop, setIsDesktop] = useState(true);
+export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const supabase = await supabaseServer();
+  const { data } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const checkScreen = () => setIsDesktop(window.innerWidth >= 768); // tablet and up
-    checkScreen();
-    window.addEventListener("resize", checkScreen);
-    return () => window.removeEventListener("resize", checkScreen);
-  }, []);
-
-  if (!isDesktop) {
-    return (
-      <div
-        style={{
-          height: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 18,
-          color: "#555",
-          textAlign: "center",
-          padding: 20,
-        }}
-      >
-        This dashboard is available on desktop only.
-      </div>
-    );
-  }
+ if (!data.user) redirect("/login?msg=401");
 
   return (
-    <Layout style={{ minHeight: "100vh" }}>
-      <Sidebar />
-      <Layout>
-        <HeaderBar />
-        <Content style={{ margin: "24px 16px", padding: 24, background: "#fff", borderRadius: 8 }}>
-          {children}
-        </Content>
+    <ClientLayoutWrapper>
+      <Layout style={{ minHeight: "100vh" }}>
+        <Sidebar />
+        <Layout>
+          <HeaderBar />
+          <div style={{ margin: "24px 16px", padding: 24, background: "#fff", borderRadius: 8 }}>
+            {children}
+          </div>
+        </Layout>
       </Layout>
-    </Layout>
+    </ClientLayoutWrapper>
   );
 }

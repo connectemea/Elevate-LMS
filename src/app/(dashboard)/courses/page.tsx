@@ -193,7 +193,12 @@ export default function CoursesPage() {
     <div style={{ padding: 24 }}>
       <Title level={2}>Courses Management</Title>
 
-      <Card>
+      <Card 
+       style={{
+            overflowX: "auto",
+            marginBottom: 16,
+          }}
+      >
         <div
           style={{
             display: "flex",

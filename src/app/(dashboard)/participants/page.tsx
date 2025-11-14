@@ -222,8 +222,18 @@ export default function ParticipantsPage() {
     <div style={{ padding: 24 }}>
       <Title level={2}>Participants Management</Title>
 
-      <Card>
-        <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 16 }}>
+      <Card
+       style={{
+         
+           marginBottom: 16 , 
+            overflowX: "auto",
+           }}
+      >
+        <div style={{
+           display: "flex", 
+           justifyContent: "space-between", 
+           marginBottom: 16 , 
+           }}>
           <Input
             placeholder="Search participants by name, email, or year..."
             value={searchText}
