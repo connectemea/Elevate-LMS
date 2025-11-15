@@ -15,6 +15,8 @@ import {
   Row,
   Col,
   Statistic,
+  Spin,
+  Result,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -205,11 +207,35 @@ export default function ParticipantCourseDetailPage() {
   };
 
   if (loading) {
-    return <div style={{ padding: 24 }}>Loading course details...</div>;
+    return (
+      <div
+        style={{
+          padding: 40,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 300,
+        }}
+      >
+        <Spin size="large" /><br />
+        <p style={{ padding: 16 }}>
+          Loading course details...
+        </p>
+      </div>
+    );
   }
 
   if (!courseDetails || !participant) {
-    return <div style={{ padding: 24 }}>Course or participant not found</div>;
+    return (
+      <div style={{ padding: 40 }}>
+        <Result
+          status="404"
+          title="Course or participant Not Found"
+          subTitle="The course or participant you're looking for does not exist or has been removed."
+        />
+      </div>
+    );
   }
 
   const calculateCategoryProgress = (sessions: SessionDetail[]) => {
