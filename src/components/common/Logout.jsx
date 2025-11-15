@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { supabase } from "@/lib/supabase-client";
+import { supabaseClient } from "@/lib/supabase-client";
 import { Button, Modal } from "antd";
 import { LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,7 @@ export default function LogoutButton() {
   const [open, setOpen] = useState(false);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await supabaseClient().auth.signOut();
     router.push("/login"); 
   };
 
