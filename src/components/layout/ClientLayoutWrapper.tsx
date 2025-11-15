@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 
 export default async function ClientLayoutWrapper({ children }: { children: React.ReactNode }) {
   const [isDesktop, setIsDesktop] = useState(true)
+  
   useEffect(() => {
     const checkScreen = () => {
       setIsDesktop(window.innerWidth >= 768)

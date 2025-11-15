@@ -9,9 +9,10 @@ const { Content } = Layout;
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getClaims();
+  const user = data?.claims;
 
- if (!data.user) redirect("/login?msg=401");
+  if (!user) redirect("/login?msg=401");
 
   return (
     <ClientLayoutWrapper>
