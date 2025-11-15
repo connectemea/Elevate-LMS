@@ -216,6 +216,9 @@ export default function CoursesPage() {
         </div>
 
         <Table
+          style={{
+            minWidth: 700
+          }}
           columns={columns}
           dataSource={courses.map((course) => ({ key: course.id, ...course }))}
           pagination={{ pageSize: 10 }}

@@ -22,6 +22,7 @@ import {
   Row,
   Col,
   Popconfirm,
+  Spin, Result
 } from "antd";
 import { Title } from "@/components/antd";
 import {
@@ -534,13 +535,33 @@ export default function CourseDetailPage() {
     },
   ];
 
-  if (loading) {
-    return <div style={{ padding: 24 }}>Loading...</div>;
-  }
+if (loading) {
+  return (
+    <div
+      style={{
+        padding: 40,
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        minHeight: 300,
+      }}
+    >
+      <Spin size="large" />
+    </div>
+  );
+}
 
-  if (!course) {
-    return <div style={{ padding: 24 }}>Course not found</div>;
-  }
+if (!course) {
+  return (
+    <div style={{ padding: 40 }}>
+      <Result
+        status="404"
+        title="Course Not Found"
+        subTitle="The course you're looking for does not exist or has been removed."
+      />
+    </div>
+  );
+}
 
   return (
     <div style={{ padding: 24 }}>
