@@ -22,6 +22,8 @@ import {
   Row,
   Col,
   Statistic,
+  Spin,
+  Result,
 } from "antd";
 import { Title } from "@/components/antd";
 import {
@@ -54,7 +56,7 @@ interface SessionProgress {
   id: string;
   sessionId: string;
   sessionTitle: string;
-  status: 'in_progress' | 'completed';
+  status: "in_progress" | "completed";
   updatedAt: string;
   assetType?: string;
   assetLink?: string;
@@ -107,13 +109,14 @@ export default function ParticipantDetailPage() {
   const [courseDetails, setCourseDetails] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
-  
+
   const [isEditModalVisible, setIsEditModalVisible] = useState(false);
   const [isEnrollModalVisible, setIsEnrollModalVisible] = useState(false);
   const [isProgressModalVisible, setIsProgressModalVisible] = useState(false);
-  const [selectedEnrollment, setSelectedEnrollment] = useState<Enrollment | null>(null);
+  const [selectedEnrollment, setSelectedEnrollment] =
+    useState<Enrollment | null>(null);
   const [updatingProgress, setUpdatingProgress] = useState<string | null>(null);
-  
+
   const [editForm] = Form.useForm();
   const [enrollForm] = Form.useForm();
   const [messageApi, contextHolder] = message.useMessage();
@@ -127,8 +130,8 @@ export default function ParticipantDetailPage() {
       setParticipant(data.participant);
       console.log("Fetched participant:", data.participant);
     } catch (error) {
-      messageApi.error('Failed to fetch participant details');
-      console.error('Error fetching participant:', error);
+      messageApi.error("Failed to fetch participant details");
+      console.error("Error fetching participant:", error);
     } finally {
       setLoading(false);
     }
@@ -136,22 +139,24 @@ export default function ParticipantDetailPage() {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('/api/courses');
+      const response = await fetch("/api/courses");
       const data = await response.json();
       setCourses(data.courses || []);
     } catch (error) {
-      console.error('Error fetching courses:', error);
+      console.error("Error fetching courses:", error);
     }
   };
 
   const fetchCourseDetails = async (courseId: string) => {
     try {
-      const response = await fetch(`/api/courses/${courseId}?participantId=${participantId}`);
+      const response = await fetch(
+        `/api/courses/${courseId}?participantId=${participantId}`
+      );
       const data = await response.json();
       setCourseDetails(data.course);
     } catch (error) {
-      messageApi.error('Failed to fetch course details');
-      console.error('Error fetching course details:', error);
+      messageApi.error("Failed to fetch course details");
+      console.error("Error fetching course details:", error);
     }
   };
 
@@ -163,11 +168,15 @@ export default function ParticipantDetailPage() {
   }, [participantId]);
 
   // Participant Operations
-  const handleEditParticipant = async (values: { name: string; email: string; year: number }) => {
+  const handleEditParticipant = async (values: {
+    name: string;
+    email: string;
+    year: number;
+  }) => {
     try {
       const response = await fetch(`/api/participants/${participantId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
 
@@ -181,16 +190,16 @@ export default function ParticipantDetailPage() {
       }
     } catch (error) {
       messageApi.error("Failed to update participant");
-      console.error('Error updating participant:', error);
+      console.error("Error updating participant:", error);
     }
   };
 
   // Enrollment Operations
   const handleEnrollParticipant = async (values: { courseId: string }) => {
     try {
-      const response = await fetch('/api/enrollments', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/enrollments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           participantId: participantId,
           courseId: values.courseId,
@@ -211,13 +220,12 @@ export default function ParticipantDetailPage() {
             enrollments: [...prev.enrollments, newEnrollment.enrollment],
           };
         });
-
       } else {
         messageApi.error("Failed to enroll participant");
       }
     } catch (error) {
       messageApi.error("Failed to enroll participant");
-      console.error('Error enrolling participant:', error);
+      console.error("Error enrolling participant:", error);
     }
   };
 
@@ -231,7 +239,7 @@ export default function ParticipantDetailPage() {
       async onOk() {
         try {
           const response = await fetch(`/api/enrollments/${enrollmentId}`, {
-            method: 'DELETE',
+            method: "DELETE",
           });
 
           if (response.ok) {
@@ -242,31 +250,34 @@ export default function ParticipantDetailPage() {
               if (!prev) return prev;
               return {
                 ...prev,
-                enrollments: prev.enrollments.filter(e => e.id !== enrollmentId),
+                enrollments: prev.enrollments.filter(
+                  (e) => e.id !== enrollmentId
+                ),
               };
-            }
-            );
-
+            });
           } else {
             messageApi.error("Failed to unenroll participant");
           }
         } catch (error) {
           messageApi.error("Failed to unenroll participant");
-          console.error('Error unenrolling participant:', error);
+          console.error("Error unenrolling participant:", error);
         }
       },
     });
   };
 
   // Session Progress Operations
-  const handleUpdateSessionProgress = async (sessionId: string, status: 'in_progress' | 'completed') => {
+  const handleUpdateSessionProgress = async (
+    sessionId: string,
+    status: "in_progress" | "completed"
+  ) => {
     if (!participant) return;
 
     setUpdatingProgress(sessionId);
     try {
-      const response = await fetch('/api/session-progress', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+      const response = await fetch("/api/session-progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sessionId,
           participantId: participant.id,
@@ -275,7 +286,7 @@ export default function ParticipantDetailPage() {
       });
 
       if (response.ok) {
-        messageApi.success(`Session marked as ${status.replace('_', ' ')}`);
+        messageApi.success(`Session marked as ${status.replace("_", " ")}`);
         if (selectedEnrollment) {
           fetchCourseDetails(selectedEnrollment.courseId);
         }
@@ -284,27 +295,27 @@ export default function ParticipantDetailPage() {
         const updatedProgress = await response.json();
         setParticipant((prev) => {
           if (!prev) return prev;
-          const existingProgressIndex = prev.sessionProgress.findIndex(sp => sp.sessionId === sessionId);
+          const existingProgressIndex = prev.sessionProgress.findIndex(
+            (sp) => sp.sessionId === sessionId
+          );
           let updatedSessionProgress = [...prev.sessionProgress];
           if (existingProgressIndex >= 0) {
-            updatedSessionProgress[existingProgressIndex] = updatedProgress.sessionProgress;
-          }
-          else {
+            updatedSessionProgress[existingProgressIndex] =
+              updatedProgress.sessionProgress;
+          } else {
             updatedSessionProgress.push(updatedProgress.sessionProgress);
           }
           return {
             ...prev,
             sessionProgress: updatedSessionProgress,
           };
-        }
-        );
-
+        });
       } else {
         messageApi.error("Failed to update session progress");
       }
     } catch (error) {
       messageApi.error("Failed to update session progress");
-      console.error('Error updating session progress:', error);
+      console.error("Error updating session progress:", error);
     } finally {
       setUpdatingProgress(null);
     }
@@ -320,10 +331,10 @@ export default function ParticipantDetailPage() {
     if (!session.assetLink) return null;
 
     switch (session.assetType) {
-      case 'youtube':
+      case "youtube":
         return (
-          <Button 
-            type="link" 
+          <Button
+            type="link"
             icon={<PlayCircleOutlined />}
             href={session.assetLink}
             target="_blank"
@@ -332,10 +343,10 @@ export default function ParticipantDetailPage() {
             Watch Video
           </Button>
         );
-      case 'pdf':
+      case "pdf":
         return (
-          <Button 
-            type="link" 
+          <Button
+            type="link"
             icon={<EyeOutlined />}
             href={session.assetLink}
             target="_blank"
@@ -344,10 +355,10 @@ export default function ParticipantDetailPage() {
             View PDF
           </Button>
         );
-      case 'web':
+      case "web":
         return (
-          <Button 
-            type="link" 
+          <Button
+            type="link"
             icon={<EyeOutlined />}
             href={session.assetLink}
             target="_blank"
@@ -358,8 +369,8 @@ export default function ParticipantDetailPage() {
         );
       default:
         return (
-          <Button 
-            type="link" 
+          <Button
+            type="link"
             icon={<EyeOutlined />}
             href={session.assetLink}
             target="_blank"
@@ -374,20 +385,20 @@ export default function ParticipantDetailPage() {
   // Enrollment Columns for Overview Tab
   const enrollmentColumns = [
     {
-    title: "Course",
-    dataIndex: ["course", "name"], // use array path for nested data
-    key: "courseName",
-    render: (name: string) => <strong>{name}</strong>,
-  },
+      title: "Course",
+      dataIndex: ["course", "name"], // use array path for nested data
+      key: "courseName",
+      render: (name: string) => <strong>{name}</strong>,
+    },
     {
       title: "Progress",
       dataIndex: "progress",
       key: "progress",
       render: (progress: number) => (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Progress 
-            percent={Math.round(progress)} 
-            size="small" 
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Progress
+            percent={Math.round(progress)}
+            size="small"
             style={{ margin: 0, flex: 1 }}
             status={progress === 100 ? "success" : "active"}
           />
@@ -399,8 +410,20 @@ export default function ParticipantDetailPage() {
       title: "Status",
       key: "status",
       render: (_: any, record: Enrollment) => (
-        <Tag color={record.progress === 100 ? "green" : record.progress > 0 ? "blue" : "default"}>
-          {record.progress === 100 ? "Completed" : record.progress > 0 ? "In Progress" : "Not Started"}
+        <Tag
+          color={
+            record.progress === 100
+              ? "green"
+              : record.progress > 0
+              ? "blue"
+              : "default"
+          }
+        >
+          {record.progress === 100
+            ? "Completed"
+            : record.progress > 0
+            ? "In Progress"
+            : "Not Started"}
         </Tag>
       ),
     },
@@ -410,31 +433,35 @@ export default function ParticipantDetailPage() {
       key: "enrolledAt",
       render: (date: string) => new Date(date).toLocaleDateString(),
     },
-   // In the enrollmentColumns array, update the actions column:
-{
-  title: "Actions",
-  key: "actions",
-  render: (_: any, record: Enrollment) => (
-    <Space>
-      <Button 
-        type="primary" 
-        size="small"
-        icon={<EyeOutlined />}
-        onClick={() => router.push(`/participants/${participantId}/course/${record.courseId}`)}
-      >
-        View Course Details
-      </Button>
-      <Button 
-        type="link" 
-        danger 
-        size="small"
-        onClick={() => handleUnenroll(record.id)}
-      >
-        Unenroll
-      </Button>
-    </Space>
-  ),
-},
+    // In the enrollmentColumns array, update the actions column:
+    {
+      title: "Actions",
+      key: "actions",
+      render: (_: any, record: Enrollment) => (
+        <Space>
+          <Button
+            type="primary"
+            size="small"
+            icon={<EyeOutlined />}
+            onClick={() =>
+              router.push(
+                `/participants/${participantId}/course/${record.courseId}`
+              )
+            }
+          >
+            View Course Details
+          </Button>
+          <Button
+            type="link"
+            danger
+            size="small"
+            onClick={() => handleUnenroll(record.id)}
+          >
+            Unenroll
+          </Button>
+        </Space>
+      ),
+    },
   ];
 
   // Progress Columns for Progress Tab
@@ -454,8 +481,8 @@ export default function ParticipantDetailPage() {
       dataIndex: "status",
       key: "status",
       render: (status: string) => (
-        <Tag color={status === 'completed' ? 'green' : 'blue'}>
-          {status.replace('_', ' ').toUpperCase()}
+        <Tag color={status === "completed" ? "green" : "blue"}>
+          {status.replace("_", " ").toUpperCase()}
         </Tag>
       ),
     },
@@ -468,11 +495,30 @@ export default function ParticipantDetailPage() {
   ];
 
   if (loading) {
-    return <div style={{ padding: 24 }}>Loading...</div>;
+    return (
+      <div
+        style={{
+          padding: 40,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 300,
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
   }
-
   if (!participant) {
-    return <div style={{ padding: 24 }}>Participant not found</div>;
+    return (
+      <div style={{ padding: 40 }}>
+        <Result
+          status="404"
+          title="Participant Not Found"
+          subTitle="The participant you're looking for does not exist or has been removed."
+        />
+      </div>
+    );
   }
 
   return (
@@ -481,15 +527,18 @@ export default function ParticipantDetailPage() {
         {/* Header */}
         <Card>
           <Space style={{ width: "100%", justifyContent: "space-between" }}>
-            <Button icon={<ArrowLeftOutlined />} onClick={() => router.push("/participants")}>
+            <Button
+              icon={<ArrowLeftOutlined />}
+              onClick={() => router.push("/participants")}
+            >
               Back to Participants
             </Button>
             <Title level={2} style={{ margin: 0 }}>
               <UserOutlined /> {participant.name}
             </Title>
             <Space>
-              <Button 
-                type="primary" 
+              <Button
+                type="primary"
                 icon={<EditOutlined />}
                 onClick={() => {
                   editForm.setFieldsValue({
@@ -510,28 +559,36 @@ export default function ParticipantDetailPage() {
         <Row gutter={16}>
           <Col span={8}>
             <Card>
-              <Statistic 
-                title="Total Enrollments" 
-                value={participant.enrollments?.length || 0} 
-                prefix={<UserOutlined />} 
+              <Statistic
+                title="Total Enrollments"
+                value={participant.enrollments?.length || 0}
+                prefix={<UserOutlined />}
               />
             </Card>
           </Col>
           <Col span={8}>
             <Card>
-              <Statistic 
-                title="Completed Courses" 
-                value={participant.enrollments?.filter(e => e.progress === 100).length || 0} 
+              <Statistic
+                title="Completed Courses"
+                value={
+                  participant.enrollments?.filter((e) => e.progress === 100)
+                    .length || 0
+                }
                 suffix="/ courses"
               />
             </Card>
           </Col>
           <Col span={8}>
             <Card>
-              <Statistic 
-                title="Average Progress" 
-                value={Math.round(participant.enrollments?.reduce((acc, e) => acc + e.progress, 0) / (participant.enrollments?.length || 1))} 
-                suffix="%" 
+              <Statistic
+                title="Average Progress"
+                value={Math.round(
+                  participant.enrollments?.reduce(
+                    (acc, e) => acc + e.progress,
+                    0
+                  ) / (participant.enrollments?.length || 1)
+                )}
+                suffix="%"
               />
             </Card>
           </Col>
@@ -551,7 +608,11 @@ export default function ParticipantDetailPage() {
           <Tabs activeKey={activeTab} onChange={setActiveTab}>
             {/* Overview Tab */}
             <TabPane tab="Overview" key="overview">
-              <Space direction="vertical" style={{ width: "100%" }} size="large">
+              <Space
+                direction="vertical"
+                style={{ width: "100%" }}
+                size="large"
+              >
                 <Card title="Participant Information">
                   <Row gutter={16}>
                     <Col span={8}>
@@ -579,8 +640,8 @@ export default function ParticipantDetailPage() {
                   </Paragraph>
                 </Card>
 
-                <Card 
-                  title="Course Enrollments" 
+                <Card
+                  title="Course Enrollments"
                   extra={
                     <Button
                       type="dashed"
@@ -593,10 +654,12 @@ export default function ParticipantDetailPage() {
                 >
                   <Table
                     columns={enrollmentColumns}
-                    dataSource={participant.enrollments?.map(enroll => ({ 
-                      key: enroll.id, 
-                      ...enroll 
-                    })) || []}
+                    dataSource={
+                      participant.enrollments?.map((enroll) => ({
+                        key: enroll.id,
+                        ...enroll,
+                      })) || []
+                    }
                     pagination={false}
                     locale={{ emptyText: "Not enrolled in any courses" }}
                   />
@@ -609,10 +672,12 @@ export default function ParticipantDetailPage() {
               <Card>
                 <Table
                   columns={progressColumns}
-                  dataSource={participant.sessionProgress?.map(progress => ({ 
-                    key: progress.id, 
-                    ...progress 
-                  })) || []}
+                  dataSource={
+                    participant.sessionProgress?.map((progress) => ({
+                      key: progress.id,
+                      ...progress,
+                    })) || []
+                  }
                   pagination={{ pageSize: 10 }}
                   locale={{ emptyText: "No session progress recorded" }}
                 />
@@ -640,7 +705,9 @@ export default function ParticipantDetailPage() {
           <Form.Item
             name="name"
             label="Full Name"
-            rules={[{ required: true, message: "Please enter participant name" }]}
+            rules={[
+              { required: true, message: "Please enter participant name" },
+            ]}
           >
             <Input placeholder="Enter full name" prefix={<UserOutlined />} />
           </Form.Item>
@@ -649,7 +716,7 @@ export default function ParticipantDetailPage() {
             label="Email"
             rules={[
               { required: true, message: "Please enter email address" },
-              { type: 'email', message: 'Please enter a valid email' }
+              { type: "email", message: "Please enter a valid email" },
             ]}
           >
             <Input placeholder="Enter email address" type="email" />
@@ -659,9 +726,9 @@ export default function ParticipantDetailPage() {
             label="Year"
             rules={[{ required: true, message: "Please enter year" }]}
           >
-            <Input 
-              placeholder="Enter year" 
-              type="number" 
+            <Input
+              placeholder="Enter year"
+              type="number"
               min={2000}
               max={2030}
             />
@@ -701,7 +768,7 @@ export default function ParticipantDetailPage() {
           >
             <Select
               placeholder="Choose a course"
-              options={courses.map(course => ({
+              options={courses.map((course) => ({
                 value: course.id,
                 label: course.name,
               }))}

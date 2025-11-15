@@ -1,6 +1,7 @@
 "use client";
 
 import { Layout, Avatar, Dropdown, Typography, Button } from "antd";
+import LogoutButton from "@/components/common/Logout";
 import {
   UserOutlined,
   LogoutOutlined,
@@ -49,14 +50,15 @@ export default function HeaderBar() {
       </Typography.Title>
 
       <div style={{ display: "flex", alignItems: "center", gap: "16px" }}>
-        <Button
+        {/* <Button
           type="primary"
           icon={<LogoutOutlined />}
           onClick={handleLogout}
           danger
         >
           Logout
-        </Button>
+        </Button> */}
+        <LogoutButton />
 
         <Dropdown
           menu={{ items: menuItems, onClick: handleMenuClick }}

@@ -193,7 +193,12 @@ export default function CoursesPage() {
     <div style={{ padding: 24 }}>
       <Title level={2}>Courses Management</Title>
 
-      <Card>
+      <Card 
+       style={{
+            overflowX: "auto",
+            marginBottom: 16,
+          }}
+      >
         <div
           style={{
             display: "flex",
@@ -211,6 +216,9 @@ export default function CoursesPage() {
         </div>
 
         <Table
+          style={{
+            minWidth: 700
+          }}
           columns={columns}
           dataSource={courses.map((course) => ({ key: course.id, ...course }))}
           pagination={{ pageSize: 10 }}
