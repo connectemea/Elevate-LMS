@@ -1,10 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase-client";
+import { supabaseClient } from "@/lib/supabase-client";
 import { Card, Input, Button, Typography, Form, message } from "antd";
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 const { Title, Text } = Typography;
 
@@ -15,16 +14,36 @@ export default function LoginPage() {
   const statusMessage = searchParams.get("msg");
   const router = useRouter();
 
+  // useEffect(() => {
+  //   const checkUser = async () => {
+  //     const { data } = await supabase.auth.getUser();
+  //     console.log("LoginPage - User Data:", data.user);
+  //     if (data.user) {
+  //       router.push("/courses");
+  //     } else {
+  //       if (statusMessage === "401") {
+  //         messageApi.info("Please log in to access this page.");
+  //       }
+  //     }
+  //   };
+  //   checkUser();
+  // }, []);
   useEffect(() => {
-    if (statusMessage === "401") {
-      messageApi.info("Please log in to access this page.");
-    }
-  }, [statusMessage]);
+    supabaseClient().auth.getUser().then(({ data }) => {
+      console.log("LoginPage - User Data:", data.user);
+      if (data.user) {
+        console.log("User already logged in, redirecting to /courses");
+        router.push("/courses");
+      } else if (statusMessage === "401") {
+        messageApi.info("Please log in to access this page.");
+      }
+    });
+  }, []);
 
   const onFinish = async (values: any) => {
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabaseClient().auth.signInWithPassword({
       email: values.email,
       password: values.password,
     });
@@ -36,7 +55,10 @@ export default function LoginPage() {
     }
 
     messageApi.success("Login successful");
-    router.push("/courses");
+
+    setTimeout(() => {
+      router.push("/courses");
+    }, 100);
   };
 
   return (
