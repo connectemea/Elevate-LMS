@@ -19,6 +19,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'Elevate LMS',
   description: 'Learning Management System',
+   icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+    apple: "/favicon.png",
+   },
 }
 
 export default function RootLayout({
