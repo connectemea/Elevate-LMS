@@ -14,6 +14,7 @@ export default function NotFound() {
         alignItems: "center",
         justifyContent: "center",
         padding: 20,
+        background: "#f0f2f5",
       }}
     >
       <Result
