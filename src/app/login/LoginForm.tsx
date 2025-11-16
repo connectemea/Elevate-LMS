@@ -54,7 +54,20 @@ const onFinish = async ({ email, password }: LoginFormValues) => {
       <Card className={styles.card}>
         <div className={styles.header}>
           <Title level={3}>Elevate LMS</Title>
+          <div className={styles.welcome}>
           <Text type="secondary">Welcome back</Text>
+          {/* auto fill cred */}
+          <Button
+            onClick={() => {
+              (document.getElementById("email") as HTMLInputElement).value =
+                "demo@gmail.com";
+              (document.getElementById("password") as HTMLInputElement).value =
+                "password";
+            }}
+          >
+            Auto-fill Demo Credentials
+          </Button>
+        </div>
         </div>
 
         {contextHolder}

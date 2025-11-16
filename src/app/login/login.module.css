@@ -24,3 +24,10 @@
   text-align: center;
   margin-top: 24px;
 }
+
+.welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+}
