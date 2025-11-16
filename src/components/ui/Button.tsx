@@ -9,6 +9,7 @@ type ButtonProps = {
   type?: "default" | "primary" | "danger"; // AntD-like API
   htmlType?: "button" | "submit" | "reset"; // form support
   className?: string;
+  size?: "small" | "middle" | "large"; 
   style?: React.CSSProperties;
   icon?: React.ReactNode;
 };
@@ -18,8 +19,10 @@ export default function Button({
   onClick,
   disabled,
   type = "default",
+   size = "middle",
   htmlType = "button",
   className = "",
+  
   style = {},
   icon,
 }: ButtonProps) {
@@ -37,6 +40,21 @@ export default function Button({
       color: "#fff",
     },
   };
+  const sizes = {
+  small: {
+    padding: "4px 10px",
+    fontSize: "12px",
+  },
+  middle: {
+    padding: "8px 14px",
+    fontSize: "14px",
+  },
+  large: {
+    padding: "12px 18px",
+    fontSize: "16px",
+  },
+};
+
 
   return (
     <button
@@ -45,7 +63,6 @@ export default function Button({
       onClick={onClick}
       className={className}
       style={{
-        padding: "8px 14px",
         borderRadius: 6,
         border: "none",
         display: "inline-flex",
@@ -56,6 +73,7 @@ export default function Button({
         fontWeight: 500,
         transition: "0.2s",
         ...colors[type],
+        ...sizes[size], 
         ...style,
       }}
     >
