@@ -42,7 +42,7 @@ a {
 }
 
 .ant-layout-sider-trigger {
-  background-color: #24163a !important;
+  /* background-color: #24163a !important; */
 }
 
 /* Hide message on desktop, show content */

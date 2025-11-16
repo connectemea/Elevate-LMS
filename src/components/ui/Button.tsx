@@ -28,7 +28,7 @@ export default function Button({
 }: ButtonProps) {
   const colors = {
     primary: {
-      background: "#51258f",
+      background: "#1677ff",
       color: "#fff",
     },
     danger: {
