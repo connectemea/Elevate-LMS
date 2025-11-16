@@ -1,5 +1,6 @@
 import { supabaseServer } from "@/lib/supabase-server";
-import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
+// import ClientLayoutWrapper from "@/components/layout/ClientLayoutWrapper";
+import ClientLayoutWrapperCss from "@/components/layout/ClientLayoutWrapperCss";
 import { Layout } from "antd";
 import Sidebar from "@/components/layout/Sidebar";
 import HeaderBar from "@/components/layout/HeaderBar";
@@ -14,7 +15,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect("/login?msg=401");
 
   return (
-    <ClientLayoutWrapper>
+    // <ClientLayoutWrapper>
+    <ClientLayoutWrapperCss>
       <Layout style={{ minHeight: "100vh" }}>
         <Sidebar />
         <Layout>
@@ -24,6 +26,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           </div>
         </Layout>
       </Layout>
-    </ClientLayoutWrapper>
+    </ClientLayoutWrapperCss>
+    // </ClientLayoutWrapper>
   );
 }

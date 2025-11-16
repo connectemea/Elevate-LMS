@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import {
   Table,
-  Button,
   Space,
   Card,
   Tag,
@@ -12,7 +11,7 @@ import {
   Form,
   Input,
 } from "antd";
-
+import  Button  from "@/components/ui/Button";
 import { Title } from "@/components/antd";
 import {
   EditOutlined,
@@ -42,6 +41,8 @@ export default function CoursesPage() {
   const [messageApi, contextHolder] = message.useMessage();
   const [modal, modalContextHolder] = Modal.useModal();
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchCourses = async () => {
     try {
@@ -121,6 +122,14 @@ export default function CoursesPage() {
   };
 
   const columns = [
+      {
+      title: "No.",
+      key: "index",
+      width: 60,
+      align: "center" as const,
+      render: (_: any, __: any, index: number) =>
+        (currentPage - 1) * pageSize + index + 1,
+    },
     {
       title: "Course Name",
       dataIndex: "name",
@@ -177,8 +186,7 @@ export default function CoursesPage() {
             View Details
           </Button>
           <Button
-            type="primary"
-            danger
+            type="danger"
             icon={<DeleteOutlined />}
             onClick={() => handleDeleteCourse(record.id)}
           >
@@ -221,11 +229,23 @@ export default function CoursesPage() {
           }}
           columns={columns}
           dataSource={courses.map((course) => ({ key: course.id, ...course }))}
-          pagination={{ pageSize: 10 }}
+         pagination={{
+            current: currentPage,
+            pageSize,
+            pageSizeOptions: ["10", "20", "50"],
+            showSizeChanger: true, 
+            onChange: (page, size) => {
+              setCurrentPage(page);
+              setPageSize(size);
+            },
+          }}
           bordered
           loading={loading}
           locale={{ emptyText: "No courses found" }}
         />
+        <div style={{textAlign: "right", marginTop: 16 }} >
+         Total Courses: {courses.length}
+         </div>
       </Card>
 
       {/* Add Course Modal */}

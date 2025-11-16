@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from "next/server";
+import { prisma } from "@/lib/prisma";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
 export async function GET() {
@@ -9,43 +9,42 @@ export async function GET() {
         enrollments: {
           include: {
             course: {
-              select: { name: true }
-            }
-          }
+              select: { name: true },
+            },
+          },
         },
         sessionStatus: {
           include: {
             session: {
-              select: { title: true }
-            }
-          }
-        }
+              select: { title: true },
+            },
+          },
+        },
       },
-      orderBy: { createdAt: 'desc' }
-    })
+      orderBy: { createdAt: "desc" },
+    });
 
     // Transform the data for frontend
-    const transformedParticipants = participants.map((participant :any) => ({
+    const transformedParticipants = participants.map((participant: any) => ({
       ...participant,
       enrollments: participant.enrollments.map((enrollment: any) => ({
         ...enrollment,
-        courseName: enrollment.course.name
+        courseName: enrollment.course.name,
       })),
       sessionProgress: participant.sessionStatus.map((progress: any) => ({
         ...progress,
-        sessionTitle: progress.session.title
-      }))
-    }))
+        sessionTitle: progress.session.title,
+      })),
+    }));
 
-    return NextResponse.json({ participants: transformedParticipants })
+    return NextResponse.json({ participants: transformedParticipants });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to fetch participants' },
+      { error: "Failed to fetch participants" },
       { status: 500 }
-    )
+    );
   }
 }
-
 
 export async function POST(req: Request) {
   try {
@@ -82,15 +81,16 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ participant });
   } catch (err) {
+      console.error("UNEXPECTED ERROR:", err);
     return NextResponse.json(
-      { error: "Failed to create participant", details: err },
+      {
+        error: "Failed to create participant",
+        errorDetails: err, // 👈 expose actual error
+      },
       { status: 500 }
     );
   }
 }
-
-
-
 
 // export async function POST(request: Request) {
 //   try {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Layout, Avatar, Dropdown, Typography, Button } from "antd";
+import { Layout, Avatar, Dropdown, Typography } from "antd";
 import LogoutButton from "@/components/common/Logout";
 import {
   UserOutlined,

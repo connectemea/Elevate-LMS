@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { supabaseClient } from "@/lib/supabase-client";
-import { Button, Modal } from "antd";
+import { Modal } from "antd";
+import Button from "@/components/ui/Button";
 import { LogoutOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
@@ -18,7 +19,7 @@ export default function LogoutButton() {
   return (
     <>
       <Button
-        danger
+        type="danger"
         icon={<LogoutOutlined />}
         onClick={() => setOpen(true)}
       >

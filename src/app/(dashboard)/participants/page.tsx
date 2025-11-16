@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import {
   Table,
-  Button,
   Space,
   Input,
   Form,
@@ -13,6 +12,7 @@ import {
   message,
   Modal,
 } from "antd";
+import  Button  from "@/components/ui/Button";
 import { Title } from "@/components/antd";
 import {
   PlusOutlined,
@@ -52,6 +52,8 @@ export default function ParticipantsPage() {
   const [newParticipantForm] = Form.useForm();
   const [modal, modalContextHolder] = Modal.useModal();
   const router = useRouter();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const fetchParticipants = async () => {
     try {
@@ -149,6 +151,14 @@ export default function ParticipantsPage() {
 
   const columns = [
     {
+      title: "No.",
+      key: "index",
+      width: 60,
+      align: "center" as const,
+      render: (_: any, __: any, index: number) =>
+        (currentPage - 1) * pageSize + index + 1,
+    },
+    {
       title: "Name",
       dataIndex: "name",
       key: "name",
@@ -219,8 +229,7 @@ export default function ParticipantsPage() {
             View Details
           </Button>
           <Button
-            type="link"
-            danger
+            type="danger"
             icon={<DeleteOutlined />}
             onClick={() => handleDeleteParticipant(record.id)}
           >
@@ -271,11 +280,24 @@ export default function ParticipantsPage() {
             key: participant.id,
             ...participant,
           }))}
-          pagination={{ pageSize: 10 }}
+          pagination={{
+            current: currentPage,
+            pageSize,
+            pageSizeOptions: ["10", "20", "50", "100"], // 👈 dropdown options
+            showSizeChanger: true, // 👈 enables the selector
+            onChange: (page, size) => {
+              setCurrentPage(page);
+              setPageSize(size);
+            },
+          }}
           bordered
           loading={loading}
           locale={{ emptyText: "No participants found" }}
         />
+
+        <div style={{ textAlign: "right", marginTop: 10 }}>
+          Total: {filteredParticipants.length}
+        </div>
       </Card>
 
       {/* Add Participant Modal */}

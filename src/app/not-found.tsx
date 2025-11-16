@@ -1,6 +1,7 @@
 "use client";
 
-import { Result, Button } from "antd";
+import { Result } from "antd";
+import  Button  from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
 
 export default function NotFound() {

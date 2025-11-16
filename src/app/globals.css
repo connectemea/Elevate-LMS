@@ -44,3 +44,29 @@ a {
 .ant-layout-sider-trigger {
   background-color: #24163a !important;
 }
+
+/* Hide message on desktop, show content */
+.desktop-only {
+  display: block;
+}
+
+.mobile-block-message {
+  display: none;
+}
+
+/* Mobile rules */
+@media (max-width: 767px) {
+  .desktop-only {
+    display: none;
+  }
+  .mobile-block-message {
+    display: flex;
+    height: 100vh;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: #555;
+    text-align: center;
+    padding: 20px;
+  }
+}

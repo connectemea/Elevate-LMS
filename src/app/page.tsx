@@ -1,12 +1,15 @@
 "use client"
 
-import { Card, Button, Title, Text } from "@/components/antd";
+import { Card,  Title, Text } from "@/components/antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import Logo from "@/assets/elevate.png";
 import Image from "next/image";
-
+import Button from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
 export default function HomePage() {
+  const router = useRouter();
+
   return (
     <div
       style={{
@@ -61,29 +64,28 @@ export default function HomePage() {
           </Text>
         </div>
 
-        <Link href="/courses">
           <Button
+            onClick={() => router.push('/courses')}
             type="primary"
-            size="large"
+            // size="large"
             icon={<ArrowRightOutlined />}
             style={{
-              background: "rgba(255, 255, 255, 0.25)",
+              background: "rgba(255, 255, 255, 0.86)",
               border: "1px solid rgba(255, 255, 255, 0.3)",
               backdropFilter: "blur(10px)",
               color: "#fff",
               fontWeight: 500,
               transition: "all 0.3s ease",
             }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255, 255, 255, 0.35)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(255, 255, 255, 0.25)";
-            }}
+            // onMouseEnter={(e) => {
+            //   e.currentTarget.style.background = "rgba(255, 255, 255, 0.35)";
+            // }}
+            // onMouseLeave={(e) => {
+            //   e.currentTarget.style.background = "rgba(255, 255, 255, 0.25)";
+            // }}
           >
             Dashboard
           </Button>
-        </Link>
       </div>
 
       {/* Center content */}
