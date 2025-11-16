@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import {
   Card,
+  Checkbox,
   Button,
   Space,
   Form,
@@ -22,11 +23,14 @@ import {
   Row,
   Col,
   Popconfirm,
-  Spin, Result
+  Spin,
+  Result,
 } from "antd";
 import { Title } from "@/components/antd";
 import {
   EditOutlined,
+  SearchOutlined,
+  UserAddOutlined,
   DeleteOutlined,
   PlusOutlined,
   SaveOutlined,
@@ -98,6 +102,12 @@ interface Enrollment {
   enrolledAt: string;
 }
 
+interface User {
+  id: string;
+  name: string;
+  email: string;
+}
+
 export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
@@ -105,6 +115,14 @@ export default function CourseDetailPage() {
 
   const [course, setCourse] = useState<Course | null>(null);
   const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
+  const [availableUsers, setAvailableUsers] = useState<User[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [enrolling, setEnrolling] = useState(false);
+  const [searchText, setSearchText] = useState("");
+  const [isAddEnrollmentModalVisible, setIsAddEnrollmentModalVisible] =
+    useState(false);
+
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("details");
   const [isEditCourseModalVisible, setIsEditCourseModalVisible] =
@@ -159,6 +177,121 @@ export default function CourseDetailPage() {
     }
   }, [courseId]);
 
+  // Fetch available users (not enrolled in this course)
+const fetchAvailableUsers = async () => {
+  try {
+    setUsersLoading(true);
+    const response = await fetch(`/api/courses/${courseId}/available-users`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
+    }
+    
+    const data = await response.json();
+    
+    if (Array.isArray(data)) {
+      setAvailableUsers(data);
+    } else {
+      console.error('Expected array but got:', data);
+      setAvailableUsers([]);
+    }
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    messageApi.error('Failed to load users. Please try again.');
+    setAvailableUsers([]);
+  } finally {
+    setUsersLoading(false);
+  }
+};
+
+// Add filteredUsers state for client-side search
+const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+
+// Update the search handler
+const handleSearch = (searchText: string) => {
+  setSearchText(searchText);
+  if (!searchText.trim()) {
+    setFilteredUsers(availableUsers);
+  } else {
+    const filtered = availableUsers.filter(user =>
+      user.name?.toLowerCase().includes(searchText.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }
+};
+
+// Update useEffect to initialize filteredUsers
+useEffect(() => {
+  if (isAddEnrollmentModalVisible) {
+    fetchAvailableUsers();
+    setSelectedUserIds([]);
+    setSearchText('');
+  }
+}, [isAddEnrollmentModalVisible]);
+
+// Update useEffect to sync filteredUsers with availableUsers
+useEffect(() => {
+  setFilteredUsers(availableUsers);
+}, [availableUsers]);
+
+  // Handle bulk enrollment
+const handleBulkEnrollment = async () => {
+  if (selectedUserIds.length === 0) {
+    messageApi.warning('Please select at least one participant');
+    return;
+  }
+
+  try {
+    setEnrolling(true);
+    console.log('Sending enrollment request for participants:', selectedUserIds);
+    
+    const response = await fetch(`/api/enrollments/${courseId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        participantIds: selectedUserIds, // Make sure this matches the API
+      }),
+    });
+
+    console.log('Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Error response:', errorText);
+      
+      let errorMessage = `Failed to enroll participants (${response.status})`;
+      try {
+        const errorData = JSON.parse(errorText);
+        errorMessage = errorData.error || errorMessage;
+        if (errorData.details) {
+          errorMessage += `: ${errorData.details}`;
+        }
+      } catch {
+        errorMessage = errorText || errorMessage;
+      }
+      
+      throw new Error(errorMessage);
+    }
+
+    const result = await response.json();
+    console.log('Enrollment result:', result);
+
+    messageApi.success(result.message || `Successfully enrolled ${result.enrolled} participants`);
+    setIsAddEnrollmentModalVisible(false);
+    setSelectedUserIds([]);
+    setSearchText('');
+    fetchEnrollments(); // Refresh enrollments list
+    
+  } catch (error) {
+    console.error('Error enrolling participants:', error);
+    messageApi.error(error instanceof Error ? error.message : 'Failed to enroll participants');
+  } finally {
+    setEnrolling(false);
+  }
+};
   // course edit handlers can be added here
   const handleEditCourse = () => {
     editCourseForm.setFieldsValue({
@@ -193,7 +326,6 @@ export default function CourseDetailPage() {
             ...updatedCourse,
           };
         });
-
       } else {
         messageApi.error("Failed to update course");
       }
@@ -535,33 +667,33 @@ export default function CourseDetailPage() {
     },
   ];
 
-if (loading) {
-  return (
-    <div
-      style={{
-        padding: 40,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        minHeight: 300,
-      }}
-    >
-      <Spin size="large" />
-    </div>
-  );
-}
+  if (loading) {
+    return (
+      <div
+        style={{
+          padding: 40,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          minHeight: 300,
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-if (!course) {
-  return (
-    <div style={{ padding: 40 }}>
-      <Result
-        status="404"
-        title="Course Not Found"
-        subTitle="The course you're looking for does not exist or has been removed."
-      />
-    </div>
-  );
-}
+  if (!course) {
+    return (
+      <div style={{ padding: 40 }}>
+        <Result
+          status="404"
+          title="Course Not Found"
+          subTitle="The course you're looking for does not exist or has been removed."
+        />
+      </div>
+    );
+  }
 
   return (
     <div style={{ padding: 24 }}>
@@ -579,7 +711,11 @@ if (!course) {
               {course.name}
             </Title>
             <Space>
-              <Button type="primary" icon={<EditOutlined />} onClick={() => handleEditCourse()}>
+              <Button
+                type="primary"
+                icon={<EditOutlined />}
+                onClick={() => handleEditCourse()}
+              >
                 Edit Course
               </Button>
             </Space>
@@ -1055,7 +1191,17 @@ if (!course) {
               tab={`Enrollments (${enrollments.length})`}
               key="enrollments"
             >
-              <Card>
+              <Card
+                extra={
+                  <Button
+                    type="primary"
+                    icon={<UserAddOutlined />}
+                    onClick={() => setIsAddEnrollmentModalVisible(true)}
+                  >
+                    Add Users
+                  </Button>
+                }
+              >
                 <Table
                   columns={enrollmentColumns}
                   dataSource={enrollments}
@@ -1225,6 +1371,91 @@ if (!course) {
           </Form.Item>
         </Form>
       </Modal>
+      {/* Add Enrollment Modal */}
+<Modal
+  title="Enroll Participants in Course"
+  open={isAddEnrollmentModalVisible}
+  onCancel={() => {
+    setIsAddEnrollmentModalVisible(false);
+    setSelectedUserIds([]);
+    setSearchText('');
+  }}
+  footer={[
+    <Button
+      key="cancel"
+      onClick={() => setIsAddEnrollmentModalVisible(false)}
+    >
+      Cancel
+    </Button>,
+    <Button
+      key="submit"
+      type="primary"
+      loading={enrolling}
+      onClick={handleBulkEnrollment}
+      disabled={selectedUserIds.length === 0}
+    >
+      Enroll Selected Participants ({selectedUserIds.length})
+    </Button>,
+  ]}
+  width={600}
+>
+  <Space direction="vertical" style={{ width: "100%" }} size="middle">
+    <Input
+      placeholder="Search participants by name or email..."
+      prefix={<SearchOutlined />}
+      value={searchText}
+      onChange={(e) => handleSearch(e.target.value)}
+      allowClear
+    />
+
+    <div style={{ maxHeight: 400, overflow: "auto" }}>
+      <List
+        loading={usersLoading}
+        dataSource={filteredUsers}
+        renderItem={(user) => (
+          <List.Item
+            actions={[
+              <Checkbox
+                key="select"
+                checked={selectedUserIds.includes(user.id)}
+                onChange={(e) => {
+                  if (e.target.checked) {
+                    setSelectedUserIds((prev) => [...prev, user.id]);
+                  } else {
+                    setSelectedUserIds((prev) =>
+                      prev.filter((id) => id !== user.id)
+                    );
+                  }
+                }}
+              >
+                Select
+              </Checkbox>,
+            ]}
+          >
+            <List.Item.Meta
+              avatar={<UserOutlined />}
+              title={user.name || "Unnamed Participant"}
+              description={user.email}
+            />
+          </List.Item>
+        )}
+        locale={{
+          emptyText: usersLoading 
+            ? "Loading participants..." 
+            : searchText
+            ? "No participants found matching your search"
+            : "No participants available to enroll"
+        }}
+      />
+    </div>
+
+    {selectedUserIds.length > 0 && (
+      <Text type="secondary">
+        {selectedUserIds.length} participant{selectedUserIds.length !== 1 ? "s" : ""} selected
+      </Text>
+    )}
+  </Space>
+</Modal>
 
       {contextHolder}
       {modalContextHolder}

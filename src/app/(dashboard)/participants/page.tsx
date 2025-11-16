@@ -1,24 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Table, 
-  Button, 
-  Space, 
-  Input, 
+import {
+  Table,
+  Button,
+  Space,
+  Input,
   Form,
-  Card, 
+  Card,
   Tag,
   Badge,
   message,
-  Modal
+  Modal,
 } from "antd";
 import { Title } from "@/components/antd";
-import { 
+import {
   PlusOutlined,
   EyeOutlined,
   DeleteOutlined,
-  UserOutlined
+  UserOutlined,
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
@@ -47,20 +47,21 @@ export default function ParticipantsPage() {
   const [loading, setLoading] = useState(true);
   const [searchText, setSearchText] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
-   const [isAddParticipantModalVisible, setIsAddParticipantModalVisible] = useState(false);
-    const [newParticipantForm] = Form.useForm();
-   const [modal, modalContextHolder] = Modal.useModal();
+  const [isAddParticipantModalVisible, setIsAddParticipantModalVisible] =
+    useState(false);
+  const [newParticipantForm] = Form.useForm();
+  const [modal, modalContextHolder] = Modal.useModal();
   const router = useRouter();
 
   const fetchParticipants = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/participants');
+      const response = await fetch("/api/participants");
       const data = await response.json();
       setParticipants(data.participants || []);
     } catch (error) {
-      messageApi.error('Failed to fetch participants');
-      console.error('Error fetching participants:', error);
+      messageApi.error("Failed to fetch participants");
+      console.error("Error fetching participants:", error);
     } finally {
       setLoading(false);
     }
@@ -70,36 +71,46 @@ export default function ParticipantsPage() {
     fetchParticipants();
   }, []);
 
-
-
   const handleViewDetails = (participantId: string) => {
     router.push(`/participants/${participantId}`);
   };
 
-   const handleAddParticipant = async (values: { name: string; email: string; year: number }) => {
-     try {
-       const response = await fetch('/api/participants', {
-         method: 'POST',
-         headers: {
-           'Content-Type': 'application/json',
-         },
-         body: JSON.stringify(values),
-       });
- 
-       if (response.ok) {
-         messageApi.success("Participant added successfully!");
-         setIsAddParticipantModalVisible(false);
-         newParticipantForm.resetFields();
-         fetchParticipants();
-       } else {
-         messageApi.error("Failed to add participant");
-       }
-     } catch (error) {
-       messageApi.error("Failed to add participant");
-       console.error('Error adding participant:', error);
-     }
-   };
+  const handleAddParticipant = async (values: {
+    name: string;
+    email: string;
+    year: number;
+  }) => {
+    try {
+      const response = await fetch("/api/participants", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
+      const result = await response.json(); // parse JSON always
+
+      if (!response.ok) {
+        if (result.errorDetails?.code === "email_exists") {
+          messageApi.error("This email is already registered.");
+        } else {
+          messageApi.error(result.error || "Failed to add participant.");
+        }
+        return;
+      }
+
+      // Success
+      messageApi.success("Participant added successfully!");
+      setIsAddParticipantModalVisible(false);
+      newParticipantForm.resetFields();
+      fetchParticipants();
+    } catch (error: any) {
+      console.error("Error adding participant:", error);
+
+      messageApi.error(
+        error?.message || "Something went wrong when adding participant."
+      );
+    }
+  };
 
   const handleDeleteParticipant = async (participantId: string) => {
     modal.confirm({
@@ -111,7 +122,7 @@ export default function ParticipantsPage() {
       async onOk() {
         try {
           const response = await fetch(`/api/participants/${participantId}`, {
-            method: 'DELETE',
+            method: "DELETE",
           });
 
           if (response.ok) {
@@ -122,17 +133,18 @@ export default function ParticipantsPage() {
           }
         } catch (error) {
           messageApi.error("Failed to delete participant");
-          console.error('Error deleting participant:', error);
+          console.error("Error deleting participant:", error);
         }
       },
     });
   };
 
   // Search and filter
-  const filteredParticipants = participants.filter(participant =>
-    participant.name.toLowerCase().includes(searchText.toLowerCase()) ||
-    participant.email.toLowerCase().includes(searchText.toLowerCase()) ||
-    participant.year.toString().includes(searchText)
+  const filteredParticipants = participants.filter(
+    (participant) =>
+      participant.name.toLowerCase().includes(searchText.toLowerCase()) ||
+      participant.email.toLowerCase().includes(searchText.toLowerCase()) ||
+      participant.year.toString().includes(searchText)
   );
 
   const columns = [
@@ -153,7 +165,7 @@ export default function ParticipantsPage() {
       key: "email",
     },
     {
-      title: "Year",
+      title: "Year (clg joined)",
       dataIndex: "year",
       key: "year",
       align: "center" as const,
@@ -165,11 +177,11 @@ export default function ParticipantsPage() {
       key: "enrollments",
       align: "center" as const,
       render: (enrollments: Enrollment[]) => (
-        <Badge 
-          count={enrollments?.length || 0} 
-          showZero 
-          color="blue" 
-          style={{ fontSize: '12px' }}
+        <Badge
+          count={enrollments?.length || 0}
+          showZero
+          color="blue"
+          style={{ fontSize: "12px" }}
         />
       ),
     },
@@ -178,7 +190,8 @@ export default function ParticipantsPage() {
       key: "activeCourses",
       align: "center" as const,
       render: (_: any, record: Participant) => {
-        const activeCourses = record.enrollments?.filter(e => e.progress < 100).length || 0;
+        const activeCourses =
+          record.enrollments?.filter((e) => e.progress < 100).length || 0;
         return (
           <Tag color={activeCourses > 0 ? "green" : "default"}>
             {activeCourses} active
@@ -223,17 +236,18 @@ export default function ParticipantsPage() {
       <Title level={2}>Participants Management</Title>
 
       <Card
-       style={{
-         
-           marginBottom: 16 , 
-            overflowX: "auto",
-           }}
+        style={{
+          marginBottom: 16,
+          overflowX: "auto",
+        }}
       >
-        <div style={{
-           display: "flex", 
-           justifyContent: "space-between", 
-           marginBottom: 16 , 
-           }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            marginBottom: 16,
+          }}
+        >
           <Input
             placeholder="Search participants by name, email, or year..."
             value={searchText}
@@ -242,10 +256,10 @@ export default function ParticipantsPage() {
             allowClear
             prefix={<UserOutlined />}
           />
-          <Button 
-            type="primary" 
+          <Button
+            type="primary"
             icon={<PlusOutlined />}
-              onClick={() => setIsAddParticipantModalVisible(true)}
+            onClick={() => setIsAddParticipantModalVisible(true)}
           >
             Add Participant
           </Button>
@@ -253,9 +267,9 @@ export default function ParticipantsPage() {
 
         <Table
           columns={columns}
-          dataSource={filteredParticipants.map(participant => ({ 
-            key: participant.id, 
-            ...participant 
+          dataSource={filteredParticipants.map((participant) => ({
+            key: participant.id,
+            ...participant,
           }))}
           pagination={{ pageSize: 10 }}
           bordered
@@ -264,7 +278,7 @@ export default function ParticipantsPage() {
         />
       </Card>
 
-       {/* Add Participant Modal */}
+      {/* Add Participant Modal */}
       <Modal
         title="Add New Participant"
         open={isAddParticipantModalVisible}
@@ -282,7 +296,9 @@ export default function ParticipantsPage() {
           <Form.Item
             name="name"
             label="Full Name"
-            rules={[{ required: true, message: "Please enter participant name" }]}
+            rules={[
+              { required: true, message: "Please enter participant name" },
+            ]}
           >
             <Input placeholder="Enter full name" prefix={<UserOutlined />} />
           </Form.Item>
@@ -291,7 +307,7 @@ export default function ParticipantsPage() {
             label="Email"
             rules={[
               { required: true, message: "Please enter email address" },
-              { type: 'email', message: 'Please enter a valid email' }
+              { type: "email", message: "Please enter a valid email" },
             ]}
           >
             <Input placeholder="Enter email address" type="email" />
@@ -301,9 +317,9 @@ export default function ParticipantsPage() {
             label="Year"
             rules={[{ required: true, message: "Please enter year" }]}
           >
-            <Input 
-              placeholder="Enter year" 
-              type="number" 
+            <Input
+              placeholder="Enter year"
+              type="number"
               min={2000}
               max={2030}
             />

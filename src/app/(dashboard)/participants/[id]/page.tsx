@@ -571,7 +571,7 @@ export default function ParticipantDetailPage() {
               <Statistic
                 title="Completed Courses"
                 value={
-                  participant.enrollments?.filter((e) => e.progress === 100)
+                  participant.enrollments?.filter((e) => e?.progress === 100)
                     .length || 0
                 }
                 suffix="/ courses"
@@ -629,7 +629,7 @@ export default function ParticipantDetailPage() {
                     </Col>
                     <Col span={8}>
                       <Paragraph>
-                        <Text strong>Year: </Text>
+                        <Text strong>Year (clg joined): </Text>
                         <Tag color="blue">{participant.year}</Tag>
                       </Paragraph>
                     </Col>
