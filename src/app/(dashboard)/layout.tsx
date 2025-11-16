@@ -4,7 +4,6 @@ import { Layout } from "antd";
 import Sidebar from "@/components/layout/Sidebar";
 import HeaderBar from "@/components/layout/HeaderBar";
 import { redirect } from "next/navigation";
-import FadeIn from "@/components/common/FadeIn";
 const { Content } = Layout;
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -21,7 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
         <Layout>
           <HeaderBar />
           <div style={{ margin: "24px 16px", padding: 24, background: "#fff", borderRadius: 8 }}>
-             <FadeIn>{children}</FadeIn>
+           {children}
           </div>
         </Layout>
       </Layout>

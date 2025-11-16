@@ -95,7 +95,6 @@ export default function ParticipantCourseDetailPage() {
 
   const fetchCourseDetails = async () => {
     try {
-      setLoading(true);
       const response = await fetch(
         `/api/courses/${courseId}?participantId=${participantId}`
       );
@@ -109,16 +108,21 @@ export default function ParticipantCourseDetailPage() {
     } catch (error) {
       messageApi.error("Failed to fetch course details");
       console.error("Error fetching course details:", error);
-    } finally {
-      setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (participantId && courseId) {
-      fetchParticipantDetails();
-      fetchCourseDetails();
-    }
+    if (!participantId || !courseId) return;
+
+    setLoading(true);
+
+    Promise.all([fetchParticipantDetails(), fetchCourseDetails()])
+      .catch(() => {
+        messageApi.error("Failed to load participant or course data");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [participantId, courseId]);
 
   const handleUpdateSessionProgress = async (
@@ -218,10 +222,9 @@ export default function ParticipantCourseDetailPage() {
           minHeight: 300,
         }}
       >
-        <Spin size="large" /><br />
-        <p style={{ padding: 16 }}>
-          Loading course details...
-        </p>
+        <Spin size="large" />
+        <br />
+        <p style={{ padding: 16 }}>Loading course details...</p>
       </div>
     );
   }
@@ -380,7 +383,7 @@ export default function ParticipantCourseDetailPage() {
                           <Badge
                             count={
                               category.sessions.filter(
-                                (s) => s.progress?.status === "completed"
+                                (s) => s?.progress?.status === "completed"
                               ).length +
                               "/" +
                               category.sessions.length
@@ -405,7 +408,7 @@ export default function ParticipantCourseDetailPage() {
                             >
                               <Checkbox
                                 checked={
-                                  session.progress?.status === "completed"
+                                  session?.progress?.status === "completed"
                                 }
                                 disabled={updatingProgress === session.id}
                                 onChange={(e) =>

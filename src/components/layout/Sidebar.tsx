@@ -44,7 +44,7 @@ export default function Sidebar() {
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
       width={220}
-      style={{ background: "#24163a" }}
+      // style={{ background: "#24163a" }}
     >
       <div
         style={{
@@ -70,7 +70,7 @@ export default function Sidebar() {
         mode="inline"
         selectedKeys={[selectedKey]}
         items={items}
-        style={{ background: "#24163a", borderRight: 0 }}
+        // style={{ background: "#24163a", borderRight: 0 }}
       />
 
 
