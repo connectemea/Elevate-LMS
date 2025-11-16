@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-
 // GET all enrollments for a course
 export async function GET(
   request: Request,
@@ -35,7 +34,6 @@ export async function GET(
     )
   }
 }
-
 
 // POST bulk enrollments
 export async function POST(
