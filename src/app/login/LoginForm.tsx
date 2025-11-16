@@ -18,20 +18,18 @@ export default function LoginForm() {
   const [msg, contextHolder] = message.useMessage();
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const statusMessage = searchParams.get("msg");
+
+  const [form] = Form.useForm(); // <-- IMPORTANT
 
   useEffect(() => {
     supabaseClient().auth.getUser().then(({ data }) => {
       if (data.user) router.push("/courses");
-
-      if (statusMessage === "401") {
-        msg.info("Please log in first");
-      }
+      if (statusMessage === "401") msg.info("Please log in first");
     });
   }, []);
 
-const onFinish = async ({ email, password }: LoginFormValues) => {
+  const onFinish = async ({ email, password }: LoginFormValues) => {
     setLoading(true);
 
     const { error } = await supabaseClient().auth.signInWithPassword({
@@ -54,25 +52,26 @@ const onFinish = async ({ email, password }: LoginFormValues) => {
       <Card className={styles.card}>
         <div className={styles.header}>
           <Title level={3}>Elevate LMS</Title>
+
           <div className={styles.welcome}>
-          <Text type="secondary">Welcome back</Text>
-          {/* auto fill cred */}
-          <Button
-            onClick={() => {
-              (document.getElementById("email") as HTMLInputElement).value =
-                "demo@gmail.com";
-              (document.getElementById("password") as HTMLInputElement).value =
-                "password";
-            }}
-          >
-            Auto-fill Demo Credentials
-          </Button>
-        </div>
+            <Text type="secondary">Welcome back</Text>
+
+            <Button
+              onClick={() =>
+                form.setFieldsValue({
+                  email: "dev@gmail.com",
+                  password: "password",
+                })
+              }
+            >
+              Auto-fill Demo Credentials
+            </Button>
+          </div>
         </div>
 
         {contextHolder}
 
-        <Form layout="vertical" onFinish={onFinish}>
+        <Form form={form} layout="vertical" onFinish={onFinish}>
           <Form.Item
             label="Email"
             name="email"
@@ -89,13 +88,7 @@ const onFinish = async ({ email, password }: LoginFormValues) => {
             <Input.Password size="large" placeholder="••••••••" />
           </Form.Item>
 
-          <Button
-            block
-            type="primary"
-            size="large"
-            htmlType="submit"
-            loading={loading}
-          >
+          <Button block type="primary" size="large" htmlType="submit" loading={loading}>
             Login
           </Button>
         </Form>
