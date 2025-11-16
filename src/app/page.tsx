@@ -70,7 +70,7 @@ export default function HomePage() {
             // size="large"
             icon={<ArrowRightOutlined />}
             style={{
-              background: "rgba(255, 255, 255, 0.86)",
+            //   background: "rgba(255, 255, 255, 0.86)",
               border: "1px solid rgba(255, 255, 255, 0.3)",
               backdropFilter: "blur(10px)",
               color: "#fff",
