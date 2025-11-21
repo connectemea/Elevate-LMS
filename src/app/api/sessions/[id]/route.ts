@@ -2,14 +2,16 @@ import { SessionController } from "@/backend/controllers/session.controller";
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return SessionController.update(params.id, req);
+  const { id } = await params;
+  return SessionController.update(id, req);
 }
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  return SessionController.remove(params.id);
+  const { id } = await params;
+  return SessionController.remove(id);
 }
