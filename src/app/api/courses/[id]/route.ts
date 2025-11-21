@@ -1,174 +1,47 @@
-import {NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+//   { params }: { params: Promise<{ id: string }> }
+import { NextResponse, NextRequest } from "next/server";
+import { courseController } from "@/backend/controllers/course.controller";
 
 export async function GET(
-  request: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    const { searchParams } = new URL(request.url);
-    const participantId = searchParams.get('participantId');
 
-    const course = await prisma.course.findUnique({
-      where: { id },
-      include: {
-        categories: {
-          orderBy: { orderIndex: 'asc' },
-          include: {
-            sessions: {
-              orderBy: { orderIndex: 'asc' },
-              include: {
-                progress: participantId
-                  ? { where: { participantId } }
-                  : false,
-              },
-            },
-          },
-        },
-      },
-    });
+    const participantId = new URL(req.url).searchParams.get("participantId") ?? undefined;
 
-    if (!course) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-    }
-
-    // Calculate overall progress if participantId is provided
-    let overallProgress = 0;
-    if (participantId) {
-      const allSessions = course.categories.flatMap((category:any) => category.sessions);
-      const totalSessions = allSessions.length;
-      
-      if (totalSessions > 0) {
-        const completedSessions = allSessions.filter((session:any) => 
-          session.progress?.[0]?.status === 'completed'
-        ).length;
-        overallProgress = Math.round((completedSessions / totalSessions) * 100);
-      }
-    }
-
-    const transformedCourse = {
-      ...course,
-      overallProgress,
-      categories: course.categories.map((category: any) => ({
-        ...category,
-        sessions: category.sessions.map((session: any) => ({
-          ...session,
-          progress: session.progress?.[0] || null,
-        })),
-      })),
-    };
-
-    return NextResponse.json({ course: transformedCourse });
-  } catch (error) {
-    console.error('Error fetching course:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch course' },
-      { status: 500 }
-    );
-  }
-}
-// export async function GET(
-//   request: NextRequest,
-//   { params }: { params: Promise<{ id: string }>  }
-// ) {
-//   try {
-//     const { id } = await params;
-//     const { searchParams } = new URL(request.url);
-//     const participantId = searchParams.get('participantId');
-
-//     const course = await prisma.course.findUnique({
-//       where: { id: id },
-//       include: {
-//         categories: {
-//           orderBy: { orderIndex: 'asc' },
-//           include: {
-//             sessions: {
-//               orderBy: { orderIndex: 'asc' },
-//               include: {
-//                 progress: participantId ? {
-//                   where: { participantId },
-//                 } : false,
-//               },
-//             },
-//           },
-//         },
-//       },
-//     });
-
-//     if (!course) {
-//       return NextResponse.json({ error: 'Course not found' }, { status: 404 });
-//     }
-
-//     // Transform the data to include progress in sessions
-//     const transformedCourse = {
-//       ...course,
-//       categories: course.categories.map((category:any) => ({
-//         ...category,
-//         sessions: category.sessions.map((session:any) => ({
-//           ...session,
-//           progress: session.progress?.[0] || null,
-//         })),
-//       })),
-//     };
-
-//     return NextResponse.json({ course: transformedCourse });
-//   } catch (error) {
-//     console.error('Error fetching course:', error);
-//     return NextResponse.json(
-//       { error: 'Failed to fetch course' },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-
-export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }>  }) {
- const { id } = await params;
-  try {
-    const body = await request.json()
-
-    if (!id) {
-      return NextResponse.json({ error: 'Missing course ID' }, { status: 400 })
-    }
-
-    const existing = await prisma.course.findUnique({ where: { id: id } })
-
-    if (!existing) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 })
-    }
-
-    const updated = await prisma.course.update({
-      where: { id: id },
-      data: {
-        name: body.name,
-        description: body.description,
-      },
-    })
-
-    return NextResponse.json(updated)
+    const data = await courseController.get(id, { participantId });
+    return NextResponse.json({ course: data });
   } catch (err: any) {
-    console.error('PATCH error:', err)
-    return NextResponse.json({ error: err.message }, { status: 500 })
+    return NextResponse.json({ error: err.message }, { status: 404 });
   }
 }
 
-
-export async function DELETE(
-  request: Request,
-   { params }: { params: Promise<{ id: string }>  }
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { id } = await params;
-    await prisma.course.delete({
-      where: { id: id },
-    })
+    const body = await req.json();
 
-    return NextResponse.json({ success: true })
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to delete course' },
-      { status: 500 }
-    )
+    const updated = await courseController.update(id, body);
+    return NextResponse.json(updated);
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
+  }
+}
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const deleted = await courseController.remove(id);
+    return NextResponse.json({ deleted: true, id });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

@@ -1,26 +1,13 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from "next/server";
+import { categoryController } from "@/backend/controllers/category.controller";
 
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { name, orderIndex, courseId } = await request.json()
+    const body = await req.json();
+    const created = await categoryController.create(body);
 
-    const category = await prisma.courseCategory.create({
-      data: {
-        name,
-        orderIndex,
-        courseId,
-      },
-    })
-
-    return NextResponse.json(category)
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to create category' },
-      { status: 500 }
-    )
+    return NextResponse.json({ category: created });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }
-
-
-

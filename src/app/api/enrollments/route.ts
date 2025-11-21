@@ -1,42 +1,13 @@
-import { NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
+import { NextResponse } from "next/server";
+import { enrollmentController } from "@/backend/controllers/enrollment.controller";
 
-
-
-// POST single enrollment
-export async function POST(request: Request) {
+export async function POST(req: Request) {
   try {
-    const { participantId, courseId } = await request.json()
+    const body = await req.json();
+    const enrollment = await enrollmentController.enrollSingle(body);
 
-    // Check if already enrolled
-    const existingEnrollment = await prisma.courseEnrollment.findUnique({
-      where: {
-        participantId_courseId: {
-          participantId,
-          courseId
-        }
-      }
-    })
-
-    if (existingEnrollment) {
-      return NextResponse.json(
-        { error: 'Participant is already enrolled in this course' },
-        { status: 400 }
-      )
-    }
-
-    const enrollment = await prisma.courseEnrollment.create({
-      data: {
-        participantId,
-        courseId,
-      },
-    })
-
-    return NextResponse.json(enrollment)
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to create enrollment' },
-      { status: 500 }
-    )
+    return NextResponse.json({ enrollment });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 400 });
   }
 }
