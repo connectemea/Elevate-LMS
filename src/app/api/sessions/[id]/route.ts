@@ -1,17 +1,18 @@
 import { SessionController } from "@/backend/controllers/session.controller";
+import { apiHandler } from "@/lib/api-handler";
 
-export async function PUT(
+export const PUT = apiHandler(async (
   req: Request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params;
   return SessionController.update(id, req);
-}
+});
 
-export async function DELETE(
+export const DELETE = apiHandler(async (
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
-) {
+) => {
   const { id } = await params;
   return SessionController.remove(id);
-}
+});

@@ -1,47 +1,26 @@
 //   { params }: { params: Promise<{ id: string }> }
-import { NextResponse, NextRequest } from "next/server";
+import { apiHandler } from "@/lib/api-handler";
 import { courseController } from "@/backend/controllers/course.controller";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
+export const GET = apiHandler(async (req, { params }) => {
+  const { id } = await params;
 
-    const participantId = new URL(req.url).searchParams.get("participantId") ?? undefined;
+  const participantId = new URL(req.url).searchParams.get("participantId") ?? undefined;
 
-    const data = await courseController.get(id, { participantId });
-    return NextResponse.json({ course: data });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 404 });
-  }
-}
+  const data = await courseController.get(id, { participantId });
+  return { course: data };
+});
 
-export async function PATCH(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    const body = await req.json();
+export const PATCH = apiHandler(async (req, { params }) => {
+  const { id } = await params;
+  const body = await req.json();
 
-    const updated = await courseController.update(id, body);
-    return NextResponse.json(updated);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
-  }
-}
+  const updated = await courseController.update(id, body);
+  return updated;
+});
 
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    const deleted = await courseController.remove(id);
-    return NextResponse.json({ deleted: true, id });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
+export const DELETE = apiHandler(async (_req, { params }) => {
+  const { id } = await params;
+  const deleted = await courseController.remove(id);
+  return { deleted: true, id };
+});

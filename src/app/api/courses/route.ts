@@ -1,21 +1,13 @@
-import { NextResponse } from "next/server";
+import { apiHandler } from "@/lib/api-handler";
 import { courseController } from "@/backend/controllers/course.controller";
 
-export async function GET() {
-  try {
-    const data = await courseController.list();
-    return NextResponse.json({ courses: data });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
+export const GET = apiHandler(async () => {
+  const data = await courseController.list();
+  return { courses: data };
+});
 
-export async function POST(req: Request) {
-  try {
-    const body = await req.json();
-    const created = await courseController.create(body);
-    return NextResponse.json({ course: created });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
-  }
-}
+export const POST = apiHandler(async (req) => {
+  const body = await req.json();
+  const created = await courseController.create(body);
+  return { course: created };
+});

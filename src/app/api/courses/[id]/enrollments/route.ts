@@ -1,30 +1,17 @@
-import { NextResponse } from "next/server";
+import { apiHandler } from "@/lib/api-handler";
 import { courseController } from "@/backend/controllers/course.controller";
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    const data = await courseController.getEnrollments(id);
-    return NextResponse.json(data);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
-  }
-}
+export const GET = apiHandler(async (_req, { params }) => {
+  const { id } = await params;
+  const data = await courseController.getEnrollments(id);
+  return data;
+});
 
-export async function POST(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const { id } = await params;
-    const body = await req.json();
+export const POST = apiHandler(async (req, { params }) => {
+  const { id } = await params;
+  const body = await req.json();
 
-    const enrolled = await courseController.enrollParticipants(id, body.participantIds);
-    return NextResponse.json(enrolled);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 400 });
-  }
-}
+  const enrolled = await courseController.enrollParticipants(id, body.participantIds);
+  return enrolled;
+});
+ 
