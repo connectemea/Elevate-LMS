@@ -52,7 +52,20 @@ export default function LoginForm() {
       <Card className={styles.card}>
         <div className={styles.header}>
           <Title level={3}>Elevate LMS</Title>
+           <div className={styles.welcome}>
             <Text type="secondary">Welcome back</Text>
+
+            <Button
+              onClick={() =>
+                form.setFieldsValue({
+                  email: "dev@gmail.com",
+                  password: "password",
+                })
+              }
+            >
+              Auto-fill Demo Credentials
+            </Button>
+          </div>
         </div>
 
         {contextHolder}
