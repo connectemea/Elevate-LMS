@@ -5,7 +5,7 @@ import Header from "./Header";
 import HeroCard from "./HeroCard";
 import Footer from "./Footer";
 
-export default function HomeContent() {
+export default function HomePage() {
   return (
     <div
       style={{

@@ -58,11 +58,28 @@ export default function Header() {
         type="primary"
         icon={<ArrowRightOutlined />}
         style={{
-          border: "1px solid rgba(255, 255, 255, 0.3)",
-          backdropFilter: "blur(10px)",
-          color: "#fff",
-          fontWeight: 500,
-          transition: "all 0.3s ease",
+          background: "linear-gradient(135deg, #5A3DF6 0%, #4A2DE0 100%)",
+          border: "none",
+          borderRadius: 12,
+          padding: "10px 22px",
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+          fontWeight: 600,
+          fontSize: 15,
+          boxShadow: "0 4px 14px rgba(90, 61, 246, 0.35)",
+          transform: "translateY(0)",
+          transition: "all 0.18s ease",
+        }}
+        onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.boxShadow =
+            "0 6px 18px rgba(90, 61, 246, 0.45)";
+        }}
+        onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.boxShadow =
+            "0 4px 14px rgba(90, 61, 246, 0.35)";
         }}
       >
         Dashboard

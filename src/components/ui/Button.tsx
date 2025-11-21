@@ -15,6 +15,8 @@ type ButtonProps = {
   loading?: boolean;
   href?: string;
   target?: string;
+  onMouseEnter?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
 export default function Button({
@@ -30,6 +32,8 @@ export default function Button({
   icon,
   href,
   target,
+  onMouseEnter,
+  onMouseLeave,
 }: ButtonProps) {
   const colors = {
     primary: {
@@ -66,6 +70,8 @@ export default function Button({
 
   return (
     <button
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       type={htmlType}
       disabled={disabled}
       onClick={onClick}
