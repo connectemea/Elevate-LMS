@@ -6,12 +6,15 @@ type ButtonProps = {
   children: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
-  type?: "default" | "primary" | "danger"; // AntD-like API
+  type?: "default" | "primary" | "danger" | "link"; // AntD-like API
   htmlType?: "button" | "submit" | "reset"; // form support
   className?: string;
-  size?: "small" | "middle" | "large"; 
+  size?: "small" | "middle" | "large";
   style?: React.CSSProperties;
   icon?: React.ReactNode;
+  loading?: boolean;
+  href?: string;
+  target?: string;
 };
 
 export default function Button({
@@ -19,12 +22,14 @@ export default function Button({
   onClick,
   disabled,
   type = "default",
-   size = "middle",
+  size = "middle",
   htmlType = "button",
   className = "",
-  
+  loading = false,
   style = {},
   icon,
+  href,
+  target,
 }: ButtonProps) {
   const colors = {
     primary: {
@@ -35,26 +40,29 @@ export default function Button({
       background: "#ff4d4f",
       color: "#fff",
     },
+    link: {
+      background: "none",
+      color: "#1677ff",
+    },
     default: {
       background: "#1677ff",
       color: "#fff",
     },
   };
   const sizes = {
-  small: {
-    padding: "4px 10px",
-    fontSize: "12px",
-  },
-  middle: {
-    padding: "8px 14px",
-    fontSize: "14px",
-  },
-  large: {
-    padding: "12px 18px",
-    fontSize: "16px",
-  },
-};
-
+    small: {
+      padding: "4px 10px",
+      fontSize: "12px",
+    },
+    middle: {
+      padding: "8px 14px",
+      fontSize: "14px",
+    },
+    large: {
+      padding: "12px 18px",
+      fontSize: "16px",
+    },
+  };
 
   return (
     <button
@@ -73,12 +81,37 @@ export default function Button({
         fontWeight: 500,
         transition: "0.2s",
         ...colors[type],
-        ...sizes[size], 
+        ...sizes[size],
         ...style,
       }}
     >
-      {icon}
-      {children}
+      {href ? (
+        <a
+          href={href}
+          target={target}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          {loading ? (
+            "Loading..."
+          ) : (
+            <>
+              {icon}
+              {children}
+            </>
+          )}
+        </a>
+      ) : (
+        <>
+          {loading ? (
+            "Loading..."
+          ) : (
+            <>
+              {icon}
+              {children}
+            </>
+          )}
+        </>
+      )}
     </button>
   );
 }
