@@ -75,7 +75,7 @@ export default function HeaderBar() {
           >
             <Avatar
               icon={<UserOutlined />}
-              style={{ backgroundColor: "#1677ff" }}
+              style={{ backgroundColor: "#51258f" }}
             />
             <DownOutlined style={{ fontSize: "12px", color: "#555" }} />
           </div>

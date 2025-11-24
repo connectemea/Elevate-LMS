@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import * as participantService from "@/services/participant.service";
+import { participantService } from "@/services/participant.service";
 import { message } from "antd";
 
 export function useParticipants() {
@@ -8,12 +8,12 @@ export function useParticipants() {
 
   const query = useQuery({
     queryKey: ["participants"],
-    queryFn: participantService.getParticipants,
+    queryFn: () => participantService.getAll(), 
     staleTime: 1000 * 60 * 2,
   });
 
   const addMutation = useMutation({
-    mutationFn: participantService.createParticipant,
+    mutationFn: participantService.create,
     onSuccess: () => {
       messageApi.success("Participant added");
       queryClient.invalidateQueries({ queryKey: ["participants"] });
@@ -24,7 +24,7 @@ export function useParticipants() {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: participantService.deleteParticipant,
+    mutationFn: participantService.delete,
     onSuccess: () => {
       messageApi.success("Participant deleted");
       queryClient.invalidateQueries({ queryKey: ["participants"] });
@@ -36,14 +36,9 @@ export function useParticipants() {
 
   return {
     ...query,
-
     addParticipant: addMutation.mutate,
     deleteParticipant: deleteMutation.mutate,
-
     addLoading: addMutation.isPending,
     deleteLoading: deleteMutation.isPending,
-
-    addParticipantMutation: addMutation,
-    deleteParticipantMutation: deleteMutation,
   };
 }

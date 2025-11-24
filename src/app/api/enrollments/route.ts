@@ -1,8 +1,6 @@
-import { apiHandler } from "@/lib/api-handler";
 import { enrollmentController } from "@/backend/controllers/enrollment.controller";
 
-export const POST = apiHandler(async (req) => {
+export async function POST(req: Request) {
   const body = await req.json();
-    const enrollment = await enrollmentController.enrollSingle(body);
-    return { enrollment };
-});
+  return enrollmentController.enrollSingle(body);
+}

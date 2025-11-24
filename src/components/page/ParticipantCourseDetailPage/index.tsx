@@ -30,7 +30,7 @@ export default function ParticipantCourseDetail({ participantId, courseId }: { p
 
   if (loading) {
     return (
-      <div className="center">
+      <div  style={{ height: "50vh" , display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Spin size="large" />
       </div>
     );

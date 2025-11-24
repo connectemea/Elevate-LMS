@@ -1,4 +1,4 @@
-import { List, Space, Button, Tag, Typography } from "antd";
+import { List, Space,  Tag, Typography } from "antd";
 import {
   EyeOutlined,
   PlayCircleOutlined,
@@ -8,6 +8,7 @@ import {
   EditOutlined,
 } from "@ant-design/icons";
 import { Session } from "@/types";
+import Button from "@/components/ui/Button";
 
 const { Text } = Typography;
 
@@ -40,7 +41,7 @@ export default function SessionItem({
         <Button size="small" icon={<EditOutlined />} onClick={() => onEdit(categoryId, session.id)}>
           Edit
         </Button>,
-        <Button size="small" danger icon={<DeleteOutlined />} onClick={() => onDelete(session.id)}>
+        <Button size="small" type="danger" icon={<DeleteOutlined />} onClick={() => onDelete(session.id)}>
           Delete
         </Button>,
       ]}

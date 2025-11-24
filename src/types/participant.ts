@@ -14,7 +14,7 @@ export interface Participant {
   year: number;
   createdAt: string;
   enrollments: Enrollment[];
-  sessionProgress?: any[]; // fix later, not needed here
+  sessionProgress?: any[]; 
 }
 
 export interface NewParticipantPayload {

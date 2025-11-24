@@ -91,7 +91,7 @@ export default function EnrollmentTable({ enrollments }: Props) {
       dataSource={enrollments}
       pagination={{ pageSize: 10 }}
       locale={{ emptyText: "No enrollments yet" }}
-      rowKey="id"
+     rowKey={record => record.user.id}
     />
   );
 }
