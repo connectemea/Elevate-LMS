@@ -1,12 +1,7 @@
-export { default as Title } from "antd/es/typography/Title";
-export { default as Text } from "antd/es/typography/Text";
-export { default as Table } from "antd/es/table";
-export { default as Button } from "./ui/Button";
-export { default as Space } from "antd/es/space";
-export { default as Card } from "antd/es/card";
-export { default as Form } from "antd/es/form";
-export { default as Input } from "antd/es/input";
-export { default as message } from "antd/es/message";
-export { default as Typography } from "antd/es/typography";
-export { default as Alert } from "antd/es/alert";
-export { default as Layout } from "antd/es/layout";
+import { Typography, Table, Space, Card, Form, Input, message, Alert, Layout } from "antd";
+import Button from "./ui/Button";
+
+export const Title = Typography.Title;
+export const Text = Typography.Text;
+
+export { Table, Button, Space, Card, Form, Input, message, Alert, Layout };

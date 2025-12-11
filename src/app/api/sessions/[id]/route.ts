@@ -1,17 +1,30 @@
-import { SessionController } from "@/backend/controllers/session.controller";
+import { apiHandler } from '@/lib/api-handler';
+import { sessionController } from '@/backend/controllers/session.controller';
+import { NextResponse } from 'next/server';
 
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const { id } = await params;
-  return SessionController.update(id, req);
+type Params = {
+  id: string;
 };
 
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const GET = apiHandler<Params>(async (req, { params }) => {
   const { id } = await params;
-  return SessionController.remove(id);
-};
+  
+  const participantId = req.headers.get('x-user-id');
+  const session = await sessionController.get(id, participantId || undefined);
+  
+  return NextResponse.json({ session });
+});
+
+export const PUT = apiHandler<Params>(async (req, { params }) => {
+  const { id } = await params;
+  const body = await req.json();
+  
+  const updated = await sessionController.update(id, body);
+  return NextResponse.json({ session: updated });
+});
+
+export const DELETE = apiHandler<Params>(async (_req, { params }) => {
+  const { id } = await params;
+  const deleted = await sessionController.remove(id);
+  return NextResponse.json({ deleted: true, id: deleted.id });
+});

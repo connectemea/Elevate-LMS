@@ -44,7 +44,7 @@ export default function Sidebar() {
       collapsed={collapsed}
       onCollapse={(value) => setCollapsed(value)}
       width={220}
-      style={{ background: "#24163a" }}
+      style={{ background: "#24163a"  }}
     >
       <div
         style={{

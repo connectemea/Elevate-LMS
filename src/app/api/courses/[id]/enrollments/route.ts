@@ -1,17 +1,44 @@
-import { apiHandler } from "@/lib/api-handler";
-import { courseController } from "@/backend/controllers/course.controller";
+import { apiHandler } from '@/lib/api-handler';
+import { courseController } from '@/backend/controllers/course.controller';
+import { NextResponse } from 'next/server';
 
-export const GET = apiHandler(async (_req, { params }) => {
+type Params = {
+  id: string;
+};
+
+export const GET = apiHandler<Params>(async (_req, { params }) => {
   const { id } = await params;
-  const data = await courseController.getEnrollments(id);
-  return data;
+  
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Course ID required' },
+      { status: 400 }
+    );
+  }
+  
+  const enrollments = await courseController.getEnrollments(id);
+  return NextResponse.json({ enrollments });
 });
 
-export const POST = apiHandler(async (req, { params }) => {
+export const POST = apiHandler<Params>(async (req, { params }) => {
   const { id } = await params;
+  
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Course ID required' },
+      { status: 400 }
+    );
+  }
+  
   const body = await req.json();
-
-  const enrolled = await courseController.enrollParticipants(id, body.participantIds);
-  return enrolled;
+  
+  if (!body.participantIds || !Array.isArray(body.participantIds)) {
+    return NextResponse.json(
+      { error: 'participantIds array is required' },
+      { status: 400 }
+    );
+  }
+  
+  const result = await courseController.enrollParticipants(id, body.participantIds);
+  return NextResponse.json(result);
 });
- 

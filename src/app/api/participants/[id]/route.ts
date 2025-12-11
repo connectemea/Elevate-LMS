@@ -1,26 +1,27 @@
-import { ParticipantController } from "@/backend/controllers/participant.controller";
+import { apiHandler } from '@/lib/api-handler';
+import { participantController } from '@/backend/controllers/participant.controller';
+import { NextResponse } from 'next/server';
 
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+type Params = {
+  id: string;
+};
+
+export const GET = apiHandler<Params>(async (_req, { params }) => {
   const { id } = await params;
-  return ParticipantController.get(id);
-}
+  const participant = await participantController.get(id);
+  return NextResponse.json({ participant });
+});
 
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const PUT = apiHandler<Params>(async (req, { params }) => {
   const { id } = await params;
-  return ParticipantController.update(id, req);
-}
+  const body = await req.json();
+  
+  const updated = await participantController.update(id, body);
+  return NextResponse.json({ participant: updated });
+});
 
-export async function DELETE(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export const DELETE = apiHandler<Params>(async (_req, { params }) => {
   const { id } = await params;
-  return ParticipantController.remove(id);
-}
-
+  const result = await participantController.remove(id);
+  return NextResponse.json(result);
+});

@@ -1,26 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
 
-export function apiHandler(
-  handler: (req: Request, ctx?: any) => Promise<any>
-) {
-  return async (req: Request, ctx?: any) => {
+type Handler<T = any> = (
+  req: NextRequest,
+  context: { params: Promise<T> }
+) => Promise<Response>;
+
+export function apiHandler<T = any>(handler: Handler<T>) {
+  return async (req: NextRequest, context: { params: Promise<T> }): Promise<Response> => {
     try {
-      const result = await handler(req, ctx);
-      return NextResponse.json(result);
-    } catch (error: any) {
-      console.error("API ERROR:", error);
-
-      const status = error.status || 500;
-
+      return await handler(req, context);
+    } catch (error) {
+      console.error('API Error:', error);
+      
+      if (error instanceof Error) {
+        return NextResponse.json(
+          { error: error.message },
+          { status: 400 }
+        );
+      }
+      
       return NextResponse.json(
-        {
-          error: error.message || "Internal Server Error",
-          details: process.env.NODE_ENV === "development" ? error : undefined,
-        },
-        { status }
+        { error: 'Internal server error' },
+        { status: 500 }
       );
     }
   };
 }
-
-

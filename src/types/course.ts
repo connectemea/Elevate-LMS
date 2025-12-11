@@ -17,3 +17,18 @@ export interface Course {
   tempName?: string;
   tempDescription?: string;
 }
+
+export interface CourseCreateDTO {
+  name: string;
+  description?: string | null;
+}
+
+export interface CourseUpdateDTO {
+  name?: string;
+  description?: string | null;
+}
+
+export interface EnrollDTO {
+  participantIds: string[];
+}
+

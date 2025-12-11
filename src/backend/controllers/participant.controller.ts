@@ -1,54 +1,46 @@
-import { NextResponse } from "next/server";
+// backend/controllers/participant.controller.ts
 import { participantService } from "@/backend/services/participant.service";
+import { participantValidation } from "@/backend/validations/participant.validation";
 
-export const ParticipantController = {
-  async getAll() {
-    try {
-      const participants = await participantService.getAll();
-      return NextResponse.json({ participants });
-    } catch (err) {
-      return NextResponse.json(
-        { error: "Failed to fetch participants" },
-        { status: 500 }
-      );
-    }
+export const participantController = {
+  async list() {
+    return participantService.getAll();
   },
 
-  async create(req: Request) {
-    try {
-      const payload = await req.json();
-      const participant = await participantService.create(payload);
-      return NextResponse.json({ participant });
-    } catch (err: any) {
-      if (err.message === "EMAIL_EXISTS") {
-        return NextResponse.json(
-          { error: "Email already registered" },
-          { status: 400 }
-        );
-      }
-      return NextResponse.json(
-        { error: "Failed to create participant", details: err.message },
-        { status: 500 }
-      );
-    }
+  async create(payload: any) {
+    const data = participantValidation.create(payload);
+    return participantService.create(data);
   },
 
   async get(id: string) {
-    const p = await participantService.getById(id);
-    if (!p) {
-      return NextResponse.json({ error: "Not found" }, { status: 404 });
-    }
-    return NextResponse.json({ participant: p });
+    if (!id) throw new Error("Participant ID required");
+    const participant = await participantService.getById(id);
+    if (!participant) throw new Error("Participant not found");
+    return participant;
   },
 
-  async update(id: string, req: Request) {
-    const body = await req.json();
-    const updated = await participantService.update(id, body);
-    return NextResponse.json({ participant: updated });
+  async update(id: string, payload: any) {
+    if (!id) throw new Error("Participant ID required");
+    const data = participantValidation.update(payload);
+    return participantService.update(id, data);
   },
 
   async remove(id: string) {
-    await participantService.deleteById(id);
-    return NextResponse.json({ success: true });
+    if (!id) throw new Error("Participant ID required");
+    return participantService.deleteById(id);
+  },
+
+  async bulkCreate(payload: any) {
+    if (!payload || !Array.isArray(payload.participants)) {
+      throw new Error("participants array is required");
+    }
+    const validated = payload.participants.map((p: any) =>
+      participantValidation.create(p)
+    );
+    return participantService.bulkCreate(validated);
+  },
+
+  async getStatistics() {
+    return participantService.getStatistics();
   },
 };

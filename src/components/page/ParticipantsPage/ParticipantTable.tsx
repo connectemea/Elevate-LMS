@@ -30,8 +30,7 @@ export default function ParticipantTable({
       title: "No.",
       width: 60,
       align: "center",
-      render: (_, __, index) =>
-        (currentPage - 1) * pageSize + index + 1,
+      render: (_, __, index) => (currentPage - 1) * pageSize + index + 1,
     },
     {
       title: "Name",
@@ -65,7 +64,9 @@ export default function ParticipantTable({
       title: "Active Courses",
       align: "center",
       render: (_, record) => {
-        const active = record.enrollments.filter(e => e.progress < 100).length;
+        const list = record.enrollments ?? [];
+        const active = list.filter((e) => (e.progress ?? 0) < 100).length;
+
         return <Tag color={active ? "green" : "default"}>{active} active</Tag>;
       },
     },
@@ -78,7 +79,11 @@ export default function ParticipantTable({
       title: "Actions",
       render: (_, record) => (
         <Space>
-          <Button type="primary" icon={<EyeOutlined />} onClick={() => onView(record.id)}>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            onClick={() => onView(record.id)}
+          >
             View
           </Button>
 

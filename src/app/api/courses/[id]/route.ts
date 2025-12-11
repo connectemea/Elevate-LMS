@@ -1,26 +1,54 @@
-//   { params }: { params: Promise<{ id: string }> }
-import { apiHandler } from "@/lib/api-handler";
-import { courseController } from "@/backend/controllers/course.controller";
+// app/api/courses/[id]/route.ts
+import { apiHandler } from '@/lib/api-handler';
+import { courseController } from '@/backend/controllers/course.controller';
+import { NextResponse } from 'next/server';
 
-export const GET = apiHandler(async (req, { params }) => {
+type Params = {
+  id: string;
+};
+
+export const GET = apiHandler<Params>(async (req, { params }) => {
   const { id } = await params;
-
-  const participantId = new URL(req.url).searchParams.get("participantId") ?? undefined;
-
-  const data = await courseController.get(id, { participantId });
-  return { course: data };
+  
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Course ID required' },
+      { status: 400 }
+    );
+  }
+  
+  // Check if we have participant info from auth
+  const participantId = req.headers.get('x-user-id');
+  
+  const course = await courseController.get(id, participantId || undefined);
+  return NextResponse.json({ course });
 });
 
-export const PATCH = apiHandler(async (req, { params }) => {
+export const PUT = apiHandler<Params>(async (req, { params }) => {
   const { id } = await params;
+  
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Course ID required' },
+      { status: 400 }
+    );
+  }
+  
   const body = await req.json();
-
   const updated = await courseController.update(id, body);
-  return updated;
+  return NextResponse.json({ course: updated });
 });
 
-export const DELETE = apiHandler(async (_req, { params }) => {
+export const DELETE = apiHandler<Params>(async (_req, { params }) => {
   const { id } = await params;
-  const deleted = await courseController.remove(id);
-  return { deleted: true, id };
+  
+  if (!id) {
+    return NextResponse.json(
+      { error: 'Course ID required' },
+      { status: 400 }
+    );
+  }
+  
+  await courseController.remove(id);
+  return NextResponse.json({ success: true });
 });

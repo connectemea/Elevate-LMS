@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { getCourseDetail, getCourseEnrollments, getAvailableUsers } from "@/services/course.service";
+import {
+  getCourseDetail,
+  getCourseEnrollments,
+  getAvailableUsers,
+} from "@/services/course.service";
 
 export function useCourseDetail(courseId: string) {
   const courseQuery = useQuery({
@@ -18,9 +22,16 @@ export function useCourseDetail(courseId: string) {
   });
 
   return {
-    course: courseQuery.data,
-    enrollments: enrollmentsQuery.data,
-    availableUsers: usersQuery.data,
+    course: courseQuery.data ?? null,
+
+    // SAFE: always an array
+    enrollments: Array.isArray(enrollmentsQuery.data)
+      ? enrollmentsQuery.data
+      : [],
+
+    availableUsers: Array.isArray(usersQuery.data)
+      ? usersQuery.data
+      : [],
 
     loading: courseQuery.isLoading || enrollmentsQuery.isLoading,
 

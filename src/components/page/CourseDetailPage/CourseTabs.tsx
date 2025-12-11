@@ -17,15 +17,18 @@ export default function CourseTabs({
   enrollmentsTab,
   enrollmentCount,
 }: Props) {
-  return (
-    <Tabs activeKey={activeKey} onChange={onChange}>
-      <Tabs.TabPane tab="Course Details" key="details">
-        {detailsTab}
-      </Tabs.TabPane>
+  const items = [
+    {
+      key: "details",
+      label: "Course Details",
+      children: detailsTab,
+    },
+    {
+      key: "enrollments",
+      label: `Enrollments (${enrollmentCount})`,
+      children: enrollmentsTab,
+    },
+  ];
 
-      <Tabs.TabPane tab={`Enrollments (${enrollmentCount})`} key="enrollments">
-        {enrollmentsTab}
-      </Tabs.TabPane>
-    </Tabs>
-  );
+  return <Tabs activeKey={activeKey} onChange={onChange} items={items} />;
 }

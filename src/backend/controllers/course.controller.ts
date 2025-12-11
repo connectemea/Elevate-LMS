@@ -1,68 +1,41 @@
-// src/backend/controllers/course.controller.ts
-
 import { courseService } from "@/backend/services/course.service";
+import { courseValidation } from "@/backend/validations/course.validation";
 
 export const courseController = {
-  /* -------------------------------------------------------------------------- */
-  /*                                   LIST                                     */
-  /* -------------------------------------------------------------------------- */
-  async list() {
+  list() {
     return courseService.getAll();
   },
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   CREATE                                   */
-  /* -------------------------------------------------------------------------- */
-  async create(payload: { name: string; description?: string }) {
-    if (!payload?.name) throw new Error("Name is required");
-    return courseService.create(payload);
+  create(body: any) {
+    const data = courseValidation.create(body);
+    return courseService.create(data);
   },
 
-  /* -------------------------------------------------------------------------- */
-  /*                                   GET ONE                                  */
-  /* -------------------------------------------------------------------------- */
-  async get(id: string, opts?: { participantId?: string }) {
-    if (!id) throw new Error("Course ID required");
-
-    const course = await courseService.getById(id, opts?.participantId);
+  async get(id: string, participantId?: string) {
+    const course = await courseService.getById(id, participantId);
     if (!course) throw new Error("Course not found");
-
     return course;
   },
 
-  /* -------------------------------------------------------------------------- */
-  /*                                  UPDATE                                    */
-  /* -------------------------------------------------------------------------- */
-  async update(id: string, data: { name?: string; description?: string }) {
-    if (!id) throw new Error("Course ID required");
+  update(id: string, body: any) {
+    const data = courseValidation.update(body);
     return courseService.update(id, data);
   },
 
-  /* -------------------------------------------------------------------------- */
-  /*                                  DELETE                                    */
-  /* -------------------------------------------------------------------------- */
-  async remove(id: string) {
-    if (!id) throw new Error("Course ID required");
-    return courseService.deleteById(id);
+  remove(id: string) {
+    return courseService.delete(id);
   },
 
-  /* -------------------------------------------------------------------------- */
-  /*                              ENROLLMENTS                                   */
-  /* -------------------------------------------------------------------------- */
-  async getEnrollments(courseId: string) {
-    if (!courseId) throw new Error("Course ID required");
-    return courseService.getEnrollments(courseId);
+  getEnrollments(id: string) {
+    return courseService.getEnrollments(id);
   },
 
-  async getAvailableUsers(courseId: string) {
-    if (!courseId) throw new Error("Course ID required");
-    return courseService.getAvailableUsers(courseId);
+  getAvailableUsers(id: string) {
+    return courseService.getAvailableUsers(id);
   },
 
-  async enrollParticipants(courseId: string, participantIds: string[]) {
-    if (!courseId) throw new Error("Course ID required");
-    if (!participantIds?.length) throw new Error("No participants selected");
-
-    return courseService.bulkEnroll(courseId, participantIds);
-  },
+  enroll(id: string, body: any) {
+    const ids = courseValidation.enroll(body);
+    return courseService.bulkEnroll(id, ids);
+  }
 };

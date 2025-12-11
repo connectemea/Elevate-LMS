@@ -18,15 +18,15 @@ export default function EditCourseModal({
 }: Props) {
   const [form] = Form.useForm();
 
-  // preload form values when modal opens
-  useEffect(() => {
-    if (course) {
-      form.setFieldsValue({
-        name: course.name,
-        description: course.description,
-      });
-    }
-  }, [course, open]);
+useEffect(() => {
+  if (open && course) {
+    form.setFieldsValue({
+      name: course.name,
+      description: course.description,
+    });
+  }
+}, [open, course]);
+
 
   const onSubmit = async (values: any) => {
     await fetch(`/api/courses/${course.id}`, {
@@ -40,7 +40,7 @@ export default function EditCourseModal({
   };
 
   return (
-    <Modal title="Edit Course" open={open} onCancel={onClose} footer={null}>
+    <Modal title="Edit Course" open={open} onCancel={onClose} footer={null} destroyOnClose>
       <Form form={form} layout="vertical" onFinish={onSubmit}>
         <Form.Item name="name" label="Course Name" rules={[{ required: true }]}>
           <Input placeholder="Enter course name" />

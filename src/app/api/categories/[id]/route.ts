@@ -1,17 +1,27 @@
-import { apiHandler } from "@/lib/api-handler";
-import { categoryController } from "@/backend/controllers/category.controller";
+import { apiHandler } from '@/lib/api-handler';
+import { categoryController } from '@/backend/controllers/category.controller';
+import { NextResponse } from 'next/server';
 
-export const PUT = apiHandler(async (req, { params }) => {
+type Params = {
+  id: string;
+};
+
+export const GET = apiHandler<Params>(async (_req, { params }) => {
   const { id } = await params;
-  const body = await req.json();
-
-  const updated = await categoryController.update(id, body);
-  return { category: updated };
+  const category = await categoryController.get(id);
+  return NextResponse.json({ category });
 });
 
-export const DELETE = apiHandler(async (_req, { params }) => {
+export const PUT = apiHandler<Params>(async (req, { params }) => {
   const { id } = await params;
+  const body = await req.json();
+  
+  const updated = await categoryController.update(id, body);
+  return NextResponse.json({ category: updated });
+});
 
-  await categoryController.remove(id);
-  return { deleted: true, id };
+export const DELETE = apiHandler<Params>(async (_req, { params }) => {
+  const { id } = await params;
+  const deleted = await categoryController.remove(id);
+  return NextResponse.json({ deleted: true, id: deleted.id });
 });

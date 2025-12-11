@@ -2,75 +2,77 @@ import prisma from "@/backend/db/prisma";
 
 export const enrollmentService = {
   async singleEnroll(courseId: string, participantId: string) {
-    // Check duplicate
-    const existing = await prisma.courseEnrollment.findUnique({
-      where: {
-        participantId_courseId: { participantId, courseId },
-      },
-    });
+    // Validate existence
+    const course = await prisma.course.findUnique({ where: { id: courseId } });
+    if (!course) throw new Error("Course not found");
 
-    if (existing) {
-      throw new Error("Participant already enrolled");
-    }
+    const participant = await prisma.participant.findUnique({
+      where: { id: participantId },
+    });
+    if (!participant) throw new Error("Participant not found");
+
+    // Prevent duplicate
+    const existing = await prisma.courseEnrollment.findUnique({
+      where: { participantId_courseId: { participantId, courseId } },
+    });
+    if (existing) throw new Error("Already enrolled");
 
     return prisma.courseEnrollment.create({
       data: { participantId, courseId },
+      include: {
+        participant: {
+          select: { id: true, name: true, email: true },
+        },
+      },
     });
   },
 
   async getCourseEnrollments(courseId: string) {
-    const items = await prisma.courseEnrollment.findMany({
+    return prisma.courseEnrollment.findMany({
       where: { courseId },
+      orderBy: { enrolledAt: "desc" },
       include: {
         participant: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
+          select: { id: true, name: true, email: true, year: true },
         },
       },
-      orderBy: { enrolledAt: "desc" },
     });
-
-    return items;
   },
 
+  /**
+   * Fast, unique bulk-enroll
+   */
   async bulkEnroll(courseId: string, participantIds: string[]) {
-    if (!participantIds.length) {
-      throw new Error("No participants provided");
-    }
-
-    // Check duplicates
-    const existing = await prisma.courseEnrollment.findMany({
-      where: {
-        courseId,
-        participantId: { in: participantIds },
-      },
-      select: { participantId: true },
-    });
-
-    const alreadyEnrolled = existing.map((e) => e.participantId);
-    const newUsers = participantIds.filter((id) => !alreadyEnrolled.includes(id));
-
-    if (!newUsers.length) {
-      throw new Error("All selected participants already enrolled");
-    }
+    if (!participantIds.length) throw new Error("No participants provided");
 
     const result = await prisma.courseEnrollment.createMany({
-      data: newUsers.map((pid) => ({ participantId: pid, courseId })),
+      data: participantIds.map((id) => ({
+        courseId,
+        participantId: id,
+      })),
       skipDuplicates: true,
     });
 
-    return {
-      enrolled: result.count,
-      alreadyEnrolled,
-    };
+    return result;
   },
 
-  async remove(id: string) {
-    return prisma.courseEnrollment.delete({
-      where: { id },
-    });
+  remove(id: string) {
+    return prisma.courseEnrollment.delete({ where: { id } });
+  },
+
+  async getEnrollmentStats(courseId: string) {
+    const [totalEnrolled, recentEnrollments] = await Promise.all([
+      prisma.courseEnrollment.count({ where: { courseId } }),
+      prisma.courseEnrollment.findMany({
+        where: { courseId },
+        take: 5,
+        orderBy: { enrolledAt: "desc" },
+        include: {
+          participant: { select: { name: true, email: true } },
+        },
+      }),
+    ]);
+
+    return { totalEnrolled, recentEnrollments };
   },
 };

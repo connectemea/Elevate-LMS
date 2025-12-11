@@ -4,7 +4,6 @@ import { message } from "antd";
 
 export function useParticipants() {
   const queryClient = useQueryClient();
-  const [messageApi] = message.useMessage();
 
   const query = useQuery({
     queryKey: ["participants"],
@@ -15,22 +14,22 @@ export function useParticipants() {
   const addMutation = useMutation({
     mutationFn: participantService.create,
     onSuccess: () => {
-      messageApi.success("Participant added");
+      message.success("Participant added");
       queryClient.invalidateQueries({ queryKey: ["participants"] });
     },
     onError: (err: any) => {
-      messageApi.error(err.message || "Failed to add participant");
+      message.error(err.message || "Failed to add participant");
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: participantService.delete,
     onSuccess: () => {
-      messageApi.success("Participant deleted");
+      message.success("Participant deleted");
       queryClient.invalidateQueries({ queryKey: ["participants"] });
     },
     onError: () => {
-      messageApi.error("Failed to delete participant");
+      message.error("Failed to delete participant");
     },
   });
 

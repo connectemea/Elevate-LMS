@@ -1,9 +1,9 @@
-import { apiHandler } from "@/lib/api-handler";
-import { categoryController } from "@/backend/controllers/category.controller";
+import { apiHandler } from '@/lib/api-handler';
+import { categoryController } from '@/backend/controllers/category.controller';
+import { NextResponse } from 'next/server';
 
-export const POST = apiHandler(async (req: Request) => {
+export const POST = apiHandler(async (req) => {
   const body = await req.json();
-    const created = await categoryController.create(body);
-
-  return { category: created };
+  const category = await categoryController.create(body);
+  return NextResponse.json({ category });
 });

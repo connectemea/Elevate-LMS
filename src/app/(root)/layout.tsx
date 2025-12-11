@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { AntdRegistry } from '@ant-design/nextjs-registry';
-import Providers from './providers'
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import { App as AntApp } from "antd";
+import Providers from "./providers";
 import "./globals.css";
-import { ConfigProvider } from 'antd';
-import theme from '@/theme/themeConfig';
+import { ConfigProvider } from "antd";
+import theme from "@/theme/themeConfig";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,14 +18,14 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Elevate LMS',
-  description: 'Learning Management System',
-   icons: {
+  title: "Elevate LMS",
+  description: "Learning Management System",
+  icons: {
     icon: "/favicon.ico",
     shortcut: "/favicon.ico",
     apple: "/favicon.png",
-   },
-}
+  },
+};
 
 export default function RootLayout({
   children,
@@ -34,13 +35,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable}`}>
-      <ConfigProvider theme={theme}>
-        <AntdRegistry>
-         <Providers>
-        {children}
-         </Providers>
-        </AntdRegistry>
-         </ConfigProvider>
+        <ConfigProvider theme={theme}>
+          <AntdRegistry>
+            <Providers>
+              <AntApp>{children}</AntApp>
+            </Providers>
+          </AntdRegistry>
+        </ConfigProvider>
       </body>
     </html>
   );

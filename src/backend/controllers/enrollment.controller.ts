@@ -1,25 +1,31 @@
-import { enrollmentService } from "@/backend/services/enrollment.service";
+import { enrollmentService } from '@/backend/services/enrollment.service';
+import { enrollmentValidation } from '@/backend/validations/enrollment.validation';
 
 export const enrollmentController = {
-  async enrollSingle(payload: { courseId: string; participantId: string }) {
-    if (!payload.courseId || !payload.participantId) {
-      throw new Error("courseId & participantId required");
-    }
-    return enrollmentService.singleEnroll(payload.courseId, payload.participantId);
+  async enrollSingle(payload: any) {
+    const validated = enrollmentValidation.single(payload);
+    return await enrollmentService.singleEnroll(validated.courseId, validated.participantId);
   },
 
   async getEnrollments(courseId: string) {
-    if (!courseId) throw new Error("courseId required");
-    return enrollmentService.getCourseEnrollments(courseId);
+    if (!courseId) throw new Error('courseId required');
+    return await enrollmentService.getCourseEnrollments(courseId);
   },
 
-  async bulkEnroll(courseId: string, participantIds: string[]) {
-    if (!courseId) throw new Error("courseId required");
-    return enrollmentService.bulkEnroll(courseId, participantIds);
+  async bulkEnroll(courseId: string, payload: any) {
+    if (!courseId) throw new Error('courseId required');
+    
+    const participantIds = enrollmentValidation.bulk(payload);
+    return await enrollmentService.bulkEnroll(courseId, participantIds);
   },
 
   async remove(id: string) {
-    if (!id) throw new Error("enrollmentId required");
-    return enrollmentService.remove(id);
+    if (!id) throw new Error('enrollmentId required');
+    return await enrollmentService.remove(id);
+  },
+
+  async getStats(courseId: string) {
+    if (!courseId) throw new Error('courseId required');
+    return await enrollmentService.getEnrollmentStats(courseId);
   },
 };

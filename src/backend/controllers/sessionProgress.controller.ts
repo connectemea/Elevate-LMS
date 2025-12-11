@@ -1,38 +1,37 @@
-import { NextResponse } from "next/server";
-import { sessionProgressService } from "@/backend/services/sessionProgress.service";
-import { SessionStatus } from "@prisma/client";
+import { sessionProgressService } from '@/backend/services/sessionProgress.service';
+import { sessionProgressValidation } from '@/backend/validations/sessionProgress.validation';
 
 export const sessionProgressController = {
-  async update(req: Request) {
-    try {
-      const { sessionId, participantId, status } = await req.json();
+  async update(payload: any) {
+    const validated = sessionProgressValidation.update(payload);
+    return await sessionProgressService.updateProgress(
+      validated.sessionId,
+      validated.participantId,
+      validated.status
+    );
+  },
 
-      if (!sessionId || !participantId || !status) {
-        return NextResponse.json(
-          { error: "sessionId, participantId and status required" },
-          { status: 400 }
-        );
-      }
+  async getSessionProgress(sessionId: string, participantId: string) {
+    if (!sessionId) throw new Error('Session ID required');
+    if (!participantId) throw new Error('Participant ID required');
+    
+    return await sessionProgressService.getSessionProgress(sessionId, participantId);
+  },
 
-      if (!Object.values(SessionStatus).includes(status)) {
-        return NextResponse.json(
-          { error: "Invalid session status" },
-          { status: 400 }
-        );
-      }
+  async getCourseProgress(participantId: string, courseId: string) {
+    if (!participantId) throw new Error('Participant ID required');
+    if (!courseId) throw new Error('Course ID required');
+    
+    return await sessionProgressService.getCourseProgress(participantId, courseId);
+  },
 
-      const result = await sessionProgressService.updateProgress(
-        sessionId,
-        participantId,
-        status as SessionStatus
-      );
-
-      return NextResponse.json({ sessionProgress: result });
-    } catch (error: any) {
-      return NextResponse.json(
-        { error: "Failed to update session progress", detail: error.message },
-        { status: 500 }
-      );
+  async bulkUpdate(participantId: string, payload: any) {
+    if (!participantId) throw new Error('Participant ID required');
+    
+    if (!Array.isArray(payload.updates)) {
+      throw new Error('updates array is required');
     }
+    
+    return await sessionProgressService.bulkUpdateProgress(participantId, payload.updates);
   },
 };
